@@ -1,0 +1,90 @@
+[gd_scene load_steps=4 format=3 uid="uid://mwnbg3xoi0qs"]
+
+[ext_resource type="Theme" uid="uid://chjk77fcqqixf" path="res://MainWindowTheme.tres" id="1_3ygwi"]
+[ext_resource type="Script" uid="uid://d0ew2vrrsgxxc" path="res://MainWindow.gd" id="1_p4mt5"]
+[ext_resource type="StyleBox" uid="uid://gru4fxg21jjp" path="res://WindowPanelStyleBoxFlat.tres" id="2_7qsqj"]
+
+[node name="MainWindow" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_3ygwi")
+script = ExtResource("1_p4mt5")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_7qsqj")
+
+[node name="FilepathLabel" type="Label" parent="."]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 24.0
+offset_right = 192.0
+offset_bottom = 47.0
+text = "ファイルパス"
+
+[node name="FilepathEdit" type="LineEdit" parent="."]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 64.0
+offset_right = 336.0
+offset_bottom = 96.0
+placeholder_text = "例: C:/クエスト/料理作成.txt"
+
+[node name="FileDialogButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 208.0
+offset_top = 16.0
+offset_right = 336.0
+offset_bottom = 48.0
+text = "選択..."
+
+[node name="LoadButton" type="Button" parent="."]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 128.0
+offset_right = 168.0
+offset_bottom = 192.0
+text = "読み込み"
+
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 184.0
+offset_top = 128.0
+offset_right = 336.0
+offset_bottom = 192.0
+text = "保存"
+
+[node name="ContentEdit" type="TextEdit" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 352.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+placeholder_text = "ここに内容が表示されます。"
+
+[node name="ShiitoList" type="ItemList" parent="."]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 256.0
+offset_right = 336.0
+offset_bottom = 384.0
+
+[node name="ShiitoLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 232.0
+offset_right = 128.0
+offset_bottom = 255.0
+text = "シート"

@@ -1,0 +1,35 @@
+class_name Komando
+extends RefCounted
+
+enum Type
+{
+	INVALID,
+	COMMENT,
+	HLVARIABLE,
+	IFVARIABLE,
+	ELSE,
+	ELIF,
+	ENDIF,
+	LOOP,
+	ENDLOOP,
+	BREAK,
+	END,
+	LABEL,
+	JUMP,
+	MESSAGE,
+	CHOICES,
+	BRANCH,
+	WAIT,
+	EXEC,
+	COMMENT_OUT,
+	PLMOVE,
+	STRING_VARIABLE,
+	HLSTRVARIABLE,
+	BOSSBATTLE,
+}
+
+static func parse_str(text: String) -> Komando.Type:
+	for i in range(0, Komando.Type.keys().size()):
+		if text == Komando.Type.keys()[i]:
+			return Komando.Type.values()[i] as Komando.Type
+	return Komando.Type.INVALID
