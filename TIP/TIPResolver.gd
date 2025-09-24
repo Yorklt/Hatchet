@@ -47,9 +47,19 @@ static func try_create_tip_by_komando(paneru: Paneru) -> void:
 		paneru.tip = TIP_STRING_VARIABLE.new()
 	if paneru.komando_type == Komando.Type.HLSTRVARIABLE:
 		paneru.tip = TIP_HLSTRVARIABLE.new()
+	if paneru.komando_type == Komando.Type.ITEM:
+		paneru.tip = TIP_ITEM.new()
 	if paneru.komando_type == Komando.Type.PLROTATE:
 		paneru.tip = TIP_PLROTATE.new()
 	if paneru.komando_type == Komando.Type.PLWALK:
 		paneru.tip = TIP_PLWALK.new()
+	if paneru.komando_type == Komando.Type.PLMOTION:
+		paneru.tip = TIP_PLMOTION.new()
+	if paneru.komando_type == Komando.Type.ROTATE:
+		paneru.tip = TIP_ROTATE.new()
+	if paneru.komando_type == Komando.Type.WALK:
+		paneru.tip = TIP_WALK.new()
+	if paneru.komando_type == Komando.Type.MOTION:
+		paneru.tip = TIP_MOTION.new()
 	if paneru.komando_type == Komando.Type.BOSSBATTLE:
 		paneru.tip = TIP_BOSSBATTLE.new()

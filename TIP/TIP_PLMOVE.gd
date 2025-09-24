@@ -68,7 +68,7 @@ func transcript(
 
 func to_text(_last_begin: Komando.Type) -> String:
 	var text: String = ""
-	text += "[[PL移動]]"
+	text += "[[プレ移動]]"
 
 	if specify_const_loc == true:
 		text += " "

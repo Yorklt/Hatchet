@@ -1,4 +1,4 @@
-class_name TIP_PLROTATE
+class_name TIP_ROTATE
 extends TIP
 
 var dir_type: int = -1
@@ -32,7 +32,7 @@ func transcript(
 
 func to_text(_last_begin: Komando.Type) -> String:
 	var text: String = ""
-	text += "[[プレ向き]]"
+	text += "[[イベ向き]]"
 
 	text += " "
 	if dir_type == 0:
