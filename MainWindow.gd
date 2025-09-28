@@ -73,6 +73,7 @@ func _ready() -> void:
 	highlighter.add_color_region("//", "", Color.DIM_GRAY, true)
 	highlighter.add_color_region("[[", "]]", Color.AQUAMARINE, false)
 	highlighter.add_color_region("<<", ">>", Color.DARK_KHAKI, false)
+	highlighter.add_color_region("\"", "\"", Color.CHOCOLATE, false)
 
 	_content_edit.syntax_highlighter = highlighter
 

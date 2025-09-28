@@ -2,7 +2,7 @@ class_name TIP_PLMOVE
 extends TIP
 
 var specify_const_loc: bool = false
-var supotto: String = ""
+var supotto: Supotto = null
 
 var stay_mappu: bool = false
 var mappu_id: ValDesign = null
@@ -24,7 +24,7 @@ func transcript(
 	if params[p_idx].param_type == PaneruParam.Type.SUPOTTO:
 		# 特定位置を指定
 		specify_const_loc = true
-		supotto = params[p_idx].v_str
+		supotto = Supotto.create(params[p_idx].v_str)
 	else:
 		# 変数で指定
 		specify_const_loc = false
@@ -72,7 +72,8 @@ func to_text(_last_begin: Komando.Type) -> String:
 
 	if specify_const_loc == true:
 		text += " "
-		text += supotto
+		if supotto != null:	
+			text += supotto.to_text()
 
 	else:
 		text += " "

@@ -42,3 +42,20 @@ func to_text() -> String:
 		text += hensu.to_text()
 
 	return text
+
+
+static func try_parse_text(text: String) -> ValDesign:
+	var vd: ValDesign = null
+	var new_chokuchi: Chokuchi = Chokuchi.try_parse_text(text)
+	if new_chokuchi != null:
+		vd = ValDesign.new()
+		vd.val_design_type = ValDesign.Type.LITERAL
+		vd.chokuchi = new_chokuchi
+		return vd
+	var new_hensu: Hensu = Hensu.try_parse_text(text)
+	if new_chokuchi != null:
+		vd = ValDesign.new()
+		vd.val_design_type = ValDesign.Type.HENSU
+		vd.hensu = new_hensu
+		return vd
+	return null

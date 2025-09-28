@@ -3,7 +3,7 @@ extends TIP
 
 var display_text: String = ""
 var display_loc: int = 0 # 0 to 2, 4096 to 4104
-var ibento_guid: String = "" # 吹き出しが特定イベントのとき
+var ibento_guid: GUID = null # 吹き出しが特定イベントのとき
 var has_window: bool = true
 
 func transcript(
@@ -24,7 +24,7 @@ func transcript(
 	if params[p_idx].param_type == PaneruParam.Type.INT:
 		display_loc = params[p_idx].v_int
 	elif params[p_idx].param_type == PaneruParam.Type.GUID:
-		ibento_guid = params[p_idx].v_str
+		ibento_guid = GUID.create(params[p_idx].v_str)
 	else:
 		error_text += "表示位置が不明"
 
@@ -47,7 +47,7 @@ func to_text(_last_begin: Komando.Type) -> String:
 	text += "msg"
 	text += " "
 
-	if ibento_guid == "":
+	if ibento_guid == null:
 
 		if display_loc == 0:
 			text += "<<上>>"
@@ -66,7 +66,7 @@ func to_text(_last_begin: Komando.Type) -> String:
 	else:
 		text += "<<吹き出し特定ベント>>"
 		text += " "
-		text += ibento_guid
+		text += ibento_guid.to_text()
 
 	text += " "
 	if has_window == true:

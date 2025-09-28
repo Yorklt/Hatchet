@@ -1,7 +1,7 @@
 class_name TIP_ITEM
 extends TIP
 
-var item_guid: String = ""
+var item_guid: GUID = null
 var spec_angle: ValDesign = null
 var loc_in_inventory: ValDesign = null
 var change_type: int = -1
@@ -17,7 +17,7 @@ func transcript(
 
 	if params[p_idx].param_type == PaneruParam.Type.GUID:
 		# GUIDで指定
-		item_guid = params[p_idx].v_str
+		item_guid = GUID.create(params[p_idx].v_str)
 		p_idx += 1
 	else:
 		# 何番目のアイテムか
@@ -39,9 +39,9 @@ func to_text(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "[[アイテム増減]]"
 
-	if item_guid != "":
+	if item_guid != null:
 		text += " "
-		text += item_guid
+		text += item_guid.to_text()
 	else:
 		text += " "
 		text += "<<所持アイテム>>"

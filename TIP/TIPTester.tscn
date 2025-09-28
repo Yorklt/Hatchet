@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5vofrm5108yf"]
+
+[ext_resource type="Script" uid="uid://2pkrr6yvj1we" path="res://TIP/TIPTester.gd" id="1_r55q8"]
+
+[node name="TipTester" type="Node"]
+script = ExtResource("1_r55q8")

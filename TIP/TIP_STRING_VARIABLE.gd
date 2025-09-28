@@ -10,7 +10,7 @@ enum StoreType
 
 var lhs_type: int = 0
 var lhs_hensu: Hensu = null
-var lhs_guid: String = ""
+var lhs_guid: GUID = null
 var rhs_text: String = ""
 var store_type: TIP_STRING_VARIABLE.StoreType = TIP_STRING_VARIABLE.StoreType.OVERWRITE
 
@@ -48,7 +48,7 @@ func transcript(
 
 	# 変数以外への代入
 	if lhs_type != 0:
-		lhs_guid = params[p_idx].v_str
+		lhs_guid = GUID.create(params[p_idx].v_str)
 	p_idx += 1
 
 
@@ -63,7 +63,7 @@ func to_text(_last_begin: Komando.Type) -> String:
 		text += " "
 		text += "<<特殊>>"
 		text += " "
-		text += lhs_guid
+		text += lhs_guid.to_text()
 
 	if store_type == TIP_STRING_VARIABLE.StoreType.OVERWRITE:
 		text += " "

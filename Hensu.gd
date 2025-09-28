@@ -12,6 +12,9 @@ enum Type
 	I, # 添え字のリテラル整数
 }
 
+
+static var parse_fail_msg: String = ""
+
 var h_type: Hensu.Type = Hensu.Type.N
 var h_name: String = ""
 var idx_type: Hensu.Type = Hensu.Type.I
@@ -98,3 +101,51 @@ func to_text() -> String:
 		text += "h_type_ERROR" + "%d" % h_type
 
 	return text
+
+
+static func try_parse_text(text: String) -> Hensu:
+	
+	if text.length() >= 3: # L:x なので最低3文字
+		if text.left(2) == "N:":
+			var hensu: Hensu = Hensu.new()
+			hensu.h_type = Hensu.Type.N
+			hensu.h_name = text
+			return hensu
+		elif text.left(2) == "L:":
+			var hensu: Hensu = Hensu.new()
+			hensu.h_type = Hensu.Type.L
+			hensu.h_name = text
+			return hensu
+		elif text.length() >= 6 and text.left(2) == "A:": # A:x[x] なので最低6文字
+			var b0: int = text.find("[", 0)
+			var b1: int = text.find("]", 0)
+			# [も]も有って、中身が1文字以上で、]は文字列の最後
+			if b0 >= 0 and b1 >= 0 and b0 + 1 < b1 and text.length() - 1 == b1:
+				var hensu: Hensu = Hensu.new()
+				hensu.h_type = Hensu.Type.A
+
+				# 添え字
+				# 例えば、xxxxx[xxx]なら [が5で、]が9、6から長さ3
+				var idx_str: String = text.substr(b0 + 1, b1 - b0 - 1)
+				if idx_str.length() >= 3 and idx_str.left(2) == "N:": # N:x なので最低3文字
+					hensu.idx_type = Hensu.Type.N
+					hensu.idx_h_name = text
+					return hensu
+				elif idx_str.length() >= 3 and idx_str.left(2) == "L:":
+					hensu.idx_type = Hensu.Type.L
+					hensu.idx_h_name = text
+					return hensu
+				elif idx_str.is_valid_int() == true:
+					hensu.idx_type = Hensu.Type.I
+					hensu.idx_int = idx_str.to_int()
+					return hensu
+				else:
+					Hensu.parse_fail_msg = "添え字タイプが判別不可"
+			else:
+				Hensu.parse_fail_msg = "添え字の括弧の位置が不明"
+		else:
+			Hensu.parse_fail_msg = "変数タイプが判別不可"
+	else:
+		Hensu.parse_fail_msg = "3文字以上無い"
+
+	return null

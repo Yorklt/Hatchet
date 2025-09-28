@@ -2,12 +2,12 @@ class_name TIP_BOSSBATTLE
 extends TIP
 
 var monsuta_count: int = 0
-var monsuta_guids: Array[String] = []
+var monsuta_guids: Array[GUID] = []
 var monsuta_levels: Array[int] = []
 var monsuta_locs_x: Array[int] = []
 var monsuta_locs_z: Array[int] = []
 var override_music: bool = false
-var music_guid: String = ""
+var music_guid: GUID = null
 
 var disable_run_away: bool = false
 var avoid_gemuoba: bool = false
@@ -34,7 +34,7 @@ func transcript(
 
 	# モンスターGUID
 	for i in range(0, monsuta_count):
-		var guid: String = params[p_idx].v_str
+		var guid: GUID = GUID.create(params[p_idx].v_str)
 		monsuta_guids.append(guid)
 		p_idx += 1
 
@@ -57,11 +57,11 @@ func transcript(
 	p_idx += 1
 
 	# 音楽
-	music_guid = params[p_idx].v_str
+	music_guid = GUID.create(params[p_idx].v_str)
 	p_idx += 1
 
 	# 音楽
-	if music_guid == "00000000-0000-0000-0000-000000000000":
+	if music_guid.v_str == "00000000-0000-0000-0000-000000000000":
 		override_music = false
 	else:
 		override_music = true
@@ -133,11 +133,11 @@ func to_text(_last_begin: Komando.Type) -> String:
 	if override_music == true:
 		text += "<<音楽変更>>"
 		text += " "
-		text += music_guid
+		text += music_guid.to_text()
 	text += "\n"
 
 	for i in range(0, monsuta_count):
-		text += monsuta_guids[i]
+		text += monsuta_guids[i].to_text()
 		text += " "
 		text += "<<レベル>>"
 		text += " "
