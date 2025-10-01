@@ -22,6 +22,34 @@ var v_str: String = ""
 var v_jokens: Array[Joken] = []
 
 
+static func create_int(new_v_int: int) -> PaneruParam:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.INT
+	param.v_int = new_v_int
+	return param
+
+
+static func create_float(new_v_float: int) -> PaneruParam:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.FLOAT
+	param.v_float = new_v_float
+	return param
+
+
+static func create_str(new_v_str: String) -> PaneruParam:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.STRING
+	param.v_str = new_v_str
+	return param
+
+
+static func create_guid(new_v_str: String) -> PaneruParam:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.GUID
+	param.v_str = new_v_str
+	return param
+
+
 static func is_type_literal(p_type: PaneruParam.Type) -> bool:
 	if p_type == PaneruParam.Type.INT:
 		return true

@@ -2,64 +2,73 @@ class_name TIPResolver
 extends Node
 
 
-static func try_create_tip_by_komando(paneru: Paneru) -> void:
+static func try_create_tip_by_komando(komando_type: Komando.Type) -> TIP:
 
 	# TIPが増えるたびにここに付け足す
-	if paneru.komando_type == Komando.Type.COMMENT:
-		paneru.tip = TIP_COMMENT.new()
-	if paneru.komando_type == Komando.Type.HLVARIABLE:
-		paneru.tip = TIP_HLVARIABLE.new()
-	if paneru.komando_type == Komando.Type.IFVARIABLE:
-		paneru.tip = TIP_IFVARIABLE.new()
-	if paneru.komando_type == Komando.Type.ELSE:
-		paneru.tip = TIP_ELSE.new()
-	if paneru.komando_type == Komando.Type.ELIF:
-		paneru.tip = TIP_ELIF.new()
-	if paneru.komando_type == Komando.Type.ENDIF:
-		paneru.tip = TIP_ENDIF.new()
-	if paneru.komando_type == Komando.Type.LOOP:
-		paneru.tip = TIP_LOOP.new()
-	if paneru.komando_type == Komando.Type.ENDLOOP:
-		paneru.tip = TIP_ENDLOOP.new()
-	if paneru.komando_type == Komando.Type.BREAK:
-		paneru.tip = TIP_BREAK.new()
-	if paneru.komando_type == Komando.Type.END:
-		paneru.tip = TIP_END.new()
-	if paneru.komando_type == Komando.Type.LABEL:
-		paneru.tip = TIP_LABEL.new()
-	if paneru.komando_type == Komando.Type.JUMP:
-		paneru.tip = TIP_JUMP.new()
-	if paneru.komando_type == Komando.Type.MESSAGE:
-		paneru.tip = TIP_MESSAGE.new()
-	if paneru.komando_type == Komando.Type.CHOICES:
-		paneru.tip = TIP_CHOICES.new()
-	if paneru.komando_type == Komando.Type.BRANCH:
-		paneru.tip = TIP_BRANCH.new()
-	if paneru.komando_type == Komando.Type.WAIT:
-		paneru.tip = TIP_WAIT.new()
-	if paneru.komando_type == Komando.Type.EXEC:
-		paneru.tip = TIP_EXEC.new()
-	if paneru.komando_type == Komando.Type.COMMENT_OUT:
-		paneru.tip = TIP_COMMENT_OUT.new()
-	if paneru.komando_type == Komando.Type.PLMOVE:
-		paneru.tip = TIP_PLMOVE.new()
-	if paneru.komando_type == Komando.Type.STRING_VARIABLE:
-		paneru.tip = TIP_STRING_VARIABLE.new()
-	if paneru.komando_type == Komando.Type.HLSTRVARIABLE:
-		paneru.tip = TIP_HLSTRVARIABLE.new()
-	if paneru.komando_type == Komando.Type.ITEM:
-		paneru.tip = TIP_ITEM.new()
-	if paneru.komando_type == Komando.Type.PLROTATE:
-		paneru.tip = TIP_PLROTATE.new()
-	if paneru.komando_type == Komando.Type.PLWALK:
-		paneru.tip = TIP_PLWALK.new()
-	if paneru.komando_type == Komando.Type.PLMOTION:
-		paneru.tip = TIP_PLMOTION.new()
-	if paneru.komando_type == Komando.Type.ROTATE:
-		paneru.tip = TIP_ROTATE.new()
-	if paneru.komando_type == Komando.Type.WALK:
-		paneru.tip = TIP_WALK.new()
-	if paneru.komando_type == Komando.Type.MOTION:
-		paneru.tip = TIP_MOTION.new()
-	if paneru.komando_type == Komando.Type.BOSSBATTLE:
-		paneru.tip = TIP_BOSSBATTLE.new()
+	if komando_type == Komando.Type.COMMENT:
+		return TIP_COMMENT.new()
+	if komando_type == Komando.Type.HLVARIABLE:
+		return TIP_HLVARIABLE.new()
+	if komando_type == Komando.Type.IFVARIABLE:
+		return TIP_IFVARIABLE.new()
+	if komando_type == Komando.Type.ELSE:
+		return TIP_ELSE.new()
+	if komando_type == Komando.Type.ELIF:
+		return TIP_ELIF.new()
+	if komando_type == Komando.Type.ENDIF:
+		return TIP_ENDIF.new()
+	if komando_type == Komando.Type.LOOP:
+		return TIP_LOOP.new()
+	if komando_type == Komando.Type.ENDLOOP:
+		return TIP_ENDLOOP.new()
+	if komando_type == Komando.Type.BREAK:
+		return TIP_BREAK.new()
+	if komando_type == Komando.Type.END:
+		return TIP_END.new()
+	if komando_type == Komando.Type.LABEL:
+		return TIP_LABEL.new()
+	if komando_type == Komando.Type.JUMP:
+		return TIP_JUMP.new()
+	if komando_type == Komando.Type.MESSAGE:
+		return TIP_MESSAGE.new()
+	if komando_type == Komando.Type.CHOICES:
+		return TIP_CHOICES.new()
+	if komando_type == Komando.Type.BRANCH:
+		return TIP_BRANCH.new()
+	if komando_type == Komando.Type.WAIT:
+		return TIP_WAIT.new()
+	if komando_type == Komando.Type.EXEC:
+		return TIP_EXEC.new()
+	if komando_type == Komando.Type.COMMENT_OUT:
+		return TIP_COMMENT_OUT.new()
+	if komando_type == Komando.Type.PLMOVE:
+		return TIP_PLMOVE.new()
+	if komando_type == Komando.Type.STRING_VARIABLE:
+		return TIP_STRING_VARIABLE.new()
+	if komando_type == Komando.Type.HLSTRVARIABLE:
+		return TIP_HLSTRVARIABLE.new()
+	if komando_type == Komando.Type.ITEM:
+		return TIP_ITEM.new()
+	if komando_type == Komando.Type.PLROTATE:
+		return TIP_PLROTATE.new()
+	if komando_type == Komando.Type.PLWALK:
+		return TIP_PLWALK.new()
+	if komando_type == Komando.Type.PLMOTION:
+		return TIP_PLMOTION.new()
+	if komando_type == Komando.Type.ROTATE:
+		return TIP_ROTATE.new()
+	if komando_type == Komando.Type.WALK:
+		return TIP_WALK.new()
+	if komando_type == Komando.Type.MOTION:
+		return TIP_MOTION.new()
+	if komando_type == Komando.Type.BOSSBATTLE:
+		return TIP_BOSSBATTLE.new()
+
+	return null
+
+static func try_solve_initial_word(word: String) -> Komando.Type:
+
+	# TIPが増えるたびにここに付け足す
+	if word == "msg":
+		return Komando.Type.MESSAGE
+	return Komando.Type.INVALID

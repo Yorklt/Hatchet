@@ -11,11 +11,7 @@ var loc: int = 0
 # バックスラッシュの後のダブルクォーテーションは、囲み効果はない。
 # ダブルクォーテーションを除去したりはしない。
 # これ以上ワードが取れないときは、""を返す。それ以外で""を返したりはしない。
-func try_get_next_word(dst_is_quoted: Array[bool]) -> String:
-
-	if dst_is_quoted != null:
-		dst_is_quoted.resize(1)
-		dst_is_quoted[0] = false
+func try_get_next_word() -> String:
 
 	# 速度を稼ぐためにここでチェック
 	if loc > line.length() - 1:
@@ -48,8 +44,6 @@ func try_get_next_word(dst_is_quoted: Array[bool]) -> String:
 						if in_quote == true:
 							# 囲み終了
 							in_quote = false
-							if dst_is_quoted != null:
-								dst_is_quoted[0] = true
 						else:
 							# 囲み開始
 							in_quote = true

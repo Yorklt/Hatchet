@@ -4,7 +4,6 @@ extends Node
 
 func _init() -> void:
 	var edit_line: TIPEditLine = TIPEditLine.new()
-	var is_quoted: Array[bool] = []
 	var text: String = ""
 
 	edit_line.line = "\t\t call X[A] =   13.0f <<Opt>> \r\n"
@@ -12,7 +11,7 @@ func _init() -> void:
 	
 	print(edit_line.line)
 	while true:
-		text = edit_line.try_get_next_word(is_quoted)
+		text = edit_line.try_get_next_word()
 		if text == "":
 			break
 		print(text)
@@ -23,7 +22,7 @@ func _init() -> void:
 	
 	print(edit_line.line)
 	while true:
-		text = edit_line.try_get_next_word(is_quoted)
+		text = edit_line.try_get_next_word()
 		if text == "":
 			break
 		print(text)

@@ -42,6 +42,33 @@ func transcript(
 		error_text += "ウィンドウの有無が不明"
 
 
+func reverse_into_paneru_params(
+		params: Array[PaneruParam],
+		) -> void:
+
+	var param: PaneruParam = null
+
+	# テキスト
+	param = PaneruParam.create_str(display_text)
+	params.append(param)
+
+	# 表示位置
+	if ibento_guid == null:
+		param = PaneruParam.create_int(display_loc)
+		params.append(param)
+	else:
+		param = PaneruParam.create_guid(ibento_guid.v_str)
+		params.append(param)
+
+	# ウィンドウの有無
+	if has_window == true:
+		param = PaneruParam.create_int(0)
+		params.append(param)
+	else:
+		param = PaneruParam.create_int(1)
+		params.append(param)
+
+
 func to_text(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "msg"
@@ -73,10 +100,60 @@ func to_text(_last_begin: Komando.Type) -> String:
 		text += "<<枠あり>>"
 	else:
 		text += "<<枠無し>>"
+
 	text += "\n"
+
 	# 複数行に分ける
 	var lines: PackedStringArray = display_text.split("\\n", true)
 	for k in range(0, lines.size()):
-		text += lines[k]
+		text += "\"" + lines[k] + "\""
 		text += "\n"
 	return text
+
+
+func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
+
+#	msg <<上>>
+#	"こんにちは。"
+#	"いい天気ですね。"
+
+	var word: String = ""
+
+	var edit_line: TIPEditLine = null
+	
+	edit_line = edit_lines[line_idx]
+
+	word = edit_line.try_get_next_word()
+	if word != "msg":
+		return
+	
+	for i in range(0, 99):
+		word = edit_line.try_get_next_word()
+		if word == "":
+			break
+		if word == "<<上>>":
+			display_loc = 0
+		elif word == "<<中>>":
+			display_loc = 1
+		elif word == "<<下>>":
+			display_loc = 2
+		elif word == "<<吹き出し特定ベント>>":
+			word = edit_line.try_get_next_word()
+			ibento_guid = GUID.create(word)
+		else:
+			# エラー
+			pass
+
+	for i in range(0, 99):
+		line_idx += 1
+		if line_idx > edit_lines.size() - 1:
+			break
+		edit_line = edit_lines[line_idx]
+		word = edit_line.try_get_next_word()
+		if word.length() >= 2 and word[0] == "\"" and word[word.length() - 1] == "\"":
+			var striped: String = word.substr(1, word.length() - 2)
+			if display_text.length() > 0:
+				display_text += "/n"
+			display_text += striped
+		else:
+			pass
