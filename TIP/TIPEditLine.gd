@@ -27,7 +27,6 @@ func try_get_next_word() -> String:
 		var in_quote: bool = false
 		var is_escapiing: bool = false
 		for i in range(0, line.length()):
-			loc += 1
 			if loc > line.length() - 1:
 				is_finished = true
 				break
@@ -53,6 +52,8 @@ func try_get_next_word() -> String:
 				if pos0 < 0:
 					pos0 = loc
 				pos1 = loc
+
+			loc += 1
 		
 			if found_word_end == true:
 				break

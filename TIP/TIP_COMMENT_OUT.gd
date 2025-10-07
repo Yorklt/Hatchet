@@ -12,7 +12,7 @@ func transcript(
 		) -> void:	
 	block_type = TIP.BlockType.BEGIN
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "exclude"
 	return text

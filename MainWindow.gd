@@ -7,6 +7,8 @@ var _load_button: Button = null
 var _save_button: Button = null
 var _shiito_list: ItemList = null
 var _content_edit: TextEdit = null
+var _reverse_button: Button = null
+var _ibento_file_edit: TextEdit = null
 var _file_dialog: FileDialog = null
 
 var _ibento: Ibento = null
@@ -21,7 +23,9 @@ func _ready() -> void:
 	_load_button = $LoadButton as Button
 	_save_button = $SaveButton as Button
 	_shiito_list = $ShiitoList as ItemList
-	_content_edit = $ContentEdit as TextEdit
+	_content_edit = $HSplitContainer/ContentEdit as TextEdit
+	_reverse_button = $HSplitContainer/RightArea/ReverseButton as Button
+	_ibento_file_edit = $HSplitContainer/RightArea/IbentoFileText as TextEdit
 
 	# ファイルパスの入力欄
 	_filepath_line_edit.text_changed.connect(_on_filepath_line_edit_text_changed)
@@ -38,6 +42,9 @@ func _ready() -> void:
 
 	# 内容エディタ
 	_content_edit.editable = false
+
+	# 変換ボタン
+	_reverse_button.pressed.connect(_on_reverse_button_pressed)
 
 	# 内容エディタハイライト
 	var highlighter: CodeHighlighter = CodeHighlighter.new()
@@ -145,6 +152,9 @@ func _on_load_button_pressed() -> void:
 	_ibento = Ibento.new()
 	IbentoFileReader.read(_ibento, path)
 
+	for shiito_idx in range(0, _ibento.shiitos.size()):
+		TIPResolver.transcript_panels(_ibento.shiitos[shiito_idx].panerus)
+
 	_shiito_list.clear()
 	for i in range(0, _ibento.shiitos.size()):
 		_shiito_list.add_item(_ibento.shiitos[i].shiito_name)
@@ -196,7 +206,7 @@ func _show_paneru_text(shiito_idx: int) -> void:
 		var last_begin: Komando.Type = Komando.Type.INVALID
 		if begin_stack.size() > 0:
 			last_begin = begin_stack.back()
-		var paneru_text: String = paneru.to_text(last_begin)
+		var paneru_text: String = paneru.to_edit_lines(last_begin)
 
 		var block_type: TIP.BlockType = TIP.BlockType.NONE
 		if paneru.tip != null:
@@ -230,3 +240,90 @@ func _show_paneru_text(shiito_idx: int) -> void:
 		indent_count += sub_indext_next
 	_content_edit.text = text
 	_content_edit.editable = true
+	#_content_edit.scroll_vertical = float(_content_edit.get_last_unhidden_line())
+
+
+# 区切り文字で分割
+# String.splitは複数の区切り文字に対応していないので用意した。
+# \nと\rを入れて、allow_emptyをfalseにすれば、改行文字の種類気にしなく済むよ。
+static func split_text_with_delimiters(text: String, delimiters: Array[String], allow_empty: bool) -> Array[String]:
+
+	var texts: Array[String] = []
+	texts.append(text)
+	
+	const max_split: int = 0 # 無制限
+	for delimite_idx: int in range(0, delimiters.size()):
+		var texts_to_stlip: Array[String] = []
+		texts_to_stlip.append_array(texts)
+		texts = []
+		for text_to_stlip: String in texts_to_stlip:
+			var sub_array: PackedStringArray = text_to_stlip.split(delimiters[delimite_idx], allow_empty, max_split)
+			for sub_text: String in sub_array:
+				texts.append(sub_text)
+	
+	return texts
+
+
+func _on_reverse_button_pressed() -> void:
+
+	var text: String = ""
+	text = _content_edit.text
+	
+	var edit_lines: Array[TIPEditLine] = []
+	
+	if true:
+		var delimiters: Array[String] = ["\n", "\r", "\t"]
+		var lines: Array[String] = split_text_with_delimiters(text, delimiters, false)
+		for i in range(0, lines.size()):
+			var edit_line: TIPEditLine = TIPEditLine.new()
+			edit_line.line = lines[i]
+			edit_lines.append(edit_line)
+
+	var ibento: Ibento = Ibento.new()
+	var shiito: IbentoShiito = IbentoShiito.new()
+	ibento.shiitos.append(shiito)
+
+	var line_idx: int = 0
+	for i: int in range(0, edit_lines.size()):
+		if line_idx > edit_lines.size() - 1:
+			break
+		var edit_line: TIPEditLine = edit_lines[line_idx]
+		edit_line.loc = 0 # 位置を戻してやる
+		var word: String = edit_line.try_get_next_word()
+		edit_line.loc = 0 # 位置を戻してやる
+		if word == "":
+			line_idx += 1
+			continue
+		var komando_type: Komando.Type = TIPResolver.try_solve_initial_word(word)
+		if komando_type == Komando.Type.INVALID:
+			line_idx += 1
+		else:
+			var tip: TIP = TIPResolver.try_create_tip_by_komando(komando_type)
+			var line_idx_next: Array[int] = []
+			tip.from_edit_lines(line_idx_next, edit_lines, line_idx)
+			line_idx = line_idx_next[0]
+
+			var paneru: Paneru = Paneru.new()
+			paneru.komando_type = komando_type
+			paneru.tip = tip
+			
+			ibento.shiitos[0].panerus.append(paneru)
+
+			paneru.tip.reverse_into_paneru_params(paneru.params)
+
+
+	if true:
+		var lines: Array[IbentoFileLine] = []
+		for i in range(0, ibento.shiitos.size()):
+			#var shiito: IbentoShiito = ibento.shiitos[i]
+			IbentoFileWriter.shiito_to_file_text(lines, ibento.shiitos[i])
+
+		var file_text: String = ""
+		for i in range(0, lines.size()):
+			var line: String = ""
+			for k in range(0, lines[i].indent):
+				line += "\t"
+			line += lines[i].word0 + "\t" + lines[i].word1
+			file_text += line + "\n"
+			#file_access.store_line(lines[i].word0 + "\t" + lines[i].word1)
+		_ibento_file_edit.text = file_text

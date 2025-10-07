@@ -32,7 +32,7 @@ func transcript(
 	p_idx = p_idx_next[0]
 
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "if"
 	text += " "

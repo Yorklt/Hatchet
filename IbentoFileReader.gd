@@ -91,9 +91,6 @@ static func parse_panerus(dst_panerus: Array[Paneru], lines: Array[IbentoFileLin
 		elif word0 == "コマンド":
 			var paneru: Paneru = Paneru.new()
 			idx = IbentoFileReader.parse_paneru(paneru, lines, idx)
-			paneru.tip = TIPResolver.try_create_tip_by_komando(paneru.komando_type)
-			if paneru.tip != null:
-				paneru.tip.transcript(paneru.params)
 			dst_panerus.append(paneru)
 		elif word0 == "スクリプト終了":
 			return idx

@@ -46,30 +46,23 @@ func reverse_into_paneru_params(
 		params: Array[PaneruParam],
 		) -> void:
 
-	var param: PaneruParam = null
-
 	# テキスト
-	param = PaneruParam.create_str(display_text)
-	params.append(param)
+	PaneruParam.add_str_to_params(params, display_text)
 
 	# 表示位置
 	if ibento_guid == null:
-		param = PaneruParam.create_int(display_loc)
-		params.append(param)
+		PaneruParam.add_int_to_params(params, display_loc)
 	else:
-		param = PaneruParam.create_guid(ibento_guid.v_str)
-		params.append(param)
+		PaneruParam.add_guid_to_params(params, ibento_guid)
 
 	# ウィンドウの有無
 	if has_window == true:
-		param = PaneruParam.create_int(0)
-		params.append(param)
+		PaneruParam.add_int_to_params(params, 0)
 	else:
-		param = PaneruParam.create_int(1)
-		params.append(param)
+		PaneruParam.add_int_to_params(params, 1)
 
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "msg"
 	text += " "
@@ -111,11 +104,14 @@ func to_text(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
+func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
 
-#	msg <<上>>
-#	"こんにちは。"
-#	"いい天気ですね。"
+	dst_line_idx_next.resize(1)
+	dst_line_idx_next[0] = -1
+
+	# msg <<上>>
+	# "こんにちは。"
+	# "いい天気ですね。"
 
 	var word: String = ""
 
@@ -125,6 +121,7 @@ func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
 
 	word = edit_line.try_get_next_word()
 	if word != "msg":
+		error_text += "msgを期待したがmsgではない。: " + word
 		return
 	
 	for i in range(0, 99):
@@ -140,8 +137,13 @@ func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
 		elif word == "<<吹き出し特定ベント>>":
 			word = edit_line.try_get_next_word()
 			ibento_guid = GUID.create(word)
+		elif word == "<<枠あり>>":
+			has_window = true
+		elif word == "<<枠無し>>":
+			has_window = false
 		else:
 			# エラー
+			error_text += "msgの後に不明なワード: " + word
 			pass
 
 	for i in range(0, 99):
@@ -156,4 +158,7 @@ func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
 				display_text += "/n"
 			display_text += striped
 		else:
-			pass
+			edit_line.loc = 0 # 次のパネルのために戻してあげる
+			break
+
+	dst_line_idx_next[0] = line_idx

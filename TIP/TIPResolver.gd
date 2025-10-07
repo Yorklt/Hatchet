@@ -2,6 +2,16 @@ class_name TIPResolver
 extends Node
 
 
+static func transcript_panels(panerus: Array[Paneru]) -> void:
+
+	for panel_idx in range(0, panerus.size()):
+		var paneru: Paneru = panerus[panel_idx]
+		paneru.tip = TIPResolver.try_create_tip_by_komando(paneru.komando_type)
+		if paneru.tip != null:
+			paneru.tip.transcript(paneru.params)
+
+
+
 static func try_create_tip_by_komando(komando_type: Komando.Type) -> TIP:
 
 	# TIPが増えるたびにここに付け足す
@@ -69,6 +79,10 @@ static func try_create_tip_by_komando(komando_type: Komando.Type) -> TIP:
 static func try_solve_initial_word(word: String) -> Komando.Type:
 
 	# TIPが増えるたびにここに付け足す
+	if word == "//":
+		return Komando.Type.COMMENT
 	if word == "msg":
 		return Komando.Type.MESSAGE
+	if word == "call":
+		return Komando.Type.EXEC
 	return Komando.Type.INVALID

@@ -50,8 +50,34 @@ func transcript(
 		does_begin_at_next_frame = true # 互換性のためなのでおそらくこっちがデフォルト
 
 
+func reverse_into_paneru_params(
+		params: Array[PaneruParam],
+		) -> void:
 
-func to_text(_last_begin: Komando.Type) -> String:
+	# GUID
+	if true:
+		PaneruParam.add_guid_to_params(params, guid)
+
+	# 完了を待つ
+	if does_wait_finish == true:
+		PaneruParam.add_int_to_params(params, 1)
+	else:
+		PaneruParam.add_int_to_params(params, 0)
+
+	# 開始を待つ
+	if does_wait_untill_begin == true:
+		PaneruParam.add_int_to_params(params, 1)
+	else:
+		PaneruParam.add_int_to_params(params, 0)
+
+	# 次のフレームから
+	if does_begin_at_next_frame == true:
+		PaneruParam.add_int_to_params(params, 1)
+	else:
+		PaneruParam.add_int_to_params(params, 0)
+
+
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "call"
 	text += " "
@@ -82,8 +108,11 @@ func to_text(_last_begin: Komando.Type) -> String:
 	return text + error_text
 
 
-func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
-	
+func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
+
+	dst_line_idx_next.resize(1)
+	dst_line_idx_next[0] = -1
+
 #	"call" guid opt( "<<完了待つ>>" "<<完了待たず>>" .... )
 
 	var word: String = ""
@@ -94,13 +123,16 @@ func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
 
 	word = edit_line.try_get_next_word()
 	if word != "call":
+		error_text += "callを期待したがcallではない。: " + word
 		return
-	
+
 	word = edit_line.try_get_next_word()
 	if word == "":
+		error_text += "callの後でguid無しに終わっている。: " + word
 		return
 	guid = GUID.try_parse_text(word)
 	if guid == null:
+		error_text += "callの後がguidでない。: " + word
 		return
 	
 	for i in range(0, 99):
@@ -121,4 +153,8 @@ func parse_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> void:
 			does_begin_at_next_frame = false
 		else:
 			# エラー
+			error_text += "callの後に不明なワード: " + word
 			pass
+
+	line_idx += 1
+	dst_line_idx_next[0] = line_idx

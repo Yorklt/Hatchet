@@ -23,5 +23,20 @@ func transcript(
 	pass
 
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return original_komando_name + " DO NOT CALL THIS FUNC"
+
+
+func reverse_into_paneru_params(
+		_params: Array[PaneruParam],
+		) -> void:
+	pass
+
+
+func from_edit_lines(
+		dst_line_idx_next: Array[int],
+		_edit_lines: Array[TIPEditLine],
+		line_idx: int,
+		) -> void:
+	dst_line_idx_next.resize(1)
+	dst_line_idx_next[0] = line_idx + 1

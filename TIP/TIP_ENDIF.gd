@@ -9,7 +9,7 @@ func transcript(
 	block_type = TIP.BlockType.END
 
 
-func to_text(last_begin: Komando.Type) -> String:
+func to_edit_lines(last_begin: Komando.Type) -> String:
 	var text: String = ""
 
 	if last_begin == Komando.Type.IFVARIABLE:

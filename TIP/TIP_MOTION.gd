@@ -36,7 +36,7 @@ func transcript(
 		trans_time.chokuchi.v_float = 0.2
 
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "[[イベモー]]"
 

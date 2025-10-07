@@ -94,7 +94,7 @@ func transcript(
 				p_idx += 1
 			
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 
 	text += hensu_l.to_text()
@@ -111,14 +111,14 @@ func to_text(_last_begin: Komando.Type) -> String:
 	elif op_type == 2:
 		op_text += "-="
 	elif op_type == 3:
-		op_text += "!="
-	elif op_type == 4:
 		op_text += "*="
-	elif op_type == 5:
+	elif op_type == 4:
 		op_text += "/="
 	elif op_type == 5:
-		op_text += "mod="
+		op_text += "<<OP不明>>"
 	elif op_type == 6:
+		op_text += "mod="
+	elif op_type == 7:
 		op_text += "floor="
 	else:
 		op_text += "<<OP不明>>"

@@ -35,7 +35,7 @@ func transcript(
 	change_type = params[p_idx].v_int
 
 
-func to_text(_last_begin: Komando.Type) -> String:
+func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "[[アイテム増減]]"
 

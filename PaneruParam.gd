@@ -29,6 +29,10 @@ static func create_int(new_v_int: int) -> PaneruParam:
 	return param
 
 
+static func add_int_to_params(params: Array[PaneruParam], new_v_int: int) -> void:
+	params.append(PaneruParam.create_int(new_v_int))
+
+
 static func create_float(new_v_float: int) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
 	param.param_type = PaneruParam.Type.FLOAT
@@ -43,11 +47,19 @@ static func create_str(new_v_str: String) -> PaneruParam:
 	return param
 
 
-static func create_guid(new_v_str: String) -> PaneruParam:
+static func add_str_to_params(params: Array[PaneruParam], new_v_str: String) -> void:
+	params.append(PaneruParam.create_str(new_v_str))
+
+
+static func create_guid(new_guid: GUID) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
 	param.param_type = PaneruParam.Type.GUID
-	param.v_str = new_v_str
+	param.v_str = new_guid.v_str
 	return param
+
+
+static func add_guid_to_params(params: Array[PaneruParam], new_guid: GUID) -> void:
+	params.append(PaneruParam.create_guid(new_guid))
 
 
 static func is_type_literal(p_type: PaneruParam.Type) -> bool:
