@@ -14,7 +14,7 @@ func transcript(
 	if params[p_idx].param_type == PaneruParam.Type.STRING:
 		comment_text = params[p_idx].v_str
 	else:
-		error_text += "P1が文字列でない"
+		error_text += "P1が文字列でない" + " "
 
 
 func reverse_into_paneru_params(
@@ -49,7 +49,7 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 
 	word = edit_line.try_get_next_word()
 	if word != "//":
-		error_text += "//を期待したが//ではない。: " + word
+		error_text += "//を期待したが//ではない。: " + word + " "
 		return
 
 	word = edit_line.try_get_next_word()

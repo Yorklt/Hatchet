@@ -1,6 +1,8 @@
 class_name IbentoFileWriter
 extends Node
 
+# KomandoTypeとPaneruParamuから、Word0とWord1を経由して、ファイルの書き込みまで。
+
 
 static func write(
 		ibento: Ibento,
@@ -15,7 +17,7 @@ static func write(
 	var lines: Array[IbentoFileLine] = []
 	for i in range(0, ibento.shiitos.size()):
 		var shiito: IbentoShiito = ibento.shiitos[i]
-		IbentoFileWriter.shiito_to_file_text(lines, shiito)
+		IbentoFileWriter.shiito_to_file_lines(lines, shiito)
 
 	for i in range(0, lines.size()):
 		var line: String = ""
@@ -27,7 +29,7 @@ static func write(
 	file_access.close()
 
 
-static func shiito_to_file_text(lines: Array[IbentoFileLine], shiito: IbentoShiito) -> void:
+static func shiito_to_file_lines(lines: Array[IbentoFileLine], shiito: IbentoShiito) -> void:
 
 	var line: IbentoFileLine = null
 	var word0: String = ""
@@ -47,7 +49,7 @@ static func shiito_to_file_text(lines: Array[IbentoFileLine], shiito: IbentoShii
 
 	for i in range(0, shiito.panerus.size()):
 		var paneru: Paneru = shiito.panerus[i]
-		IbentoFileWriter.paneru_to_file_text(lines, paneru)
+		IbentoFileWriter.paneru_to_file_lines(lines, paneru)
 
 	if true:
 		line = IbentoFileLine.new()
@@ -62,27 +64,39 @@ static func shiito_to_file_text(lines: Array[IbentoFileLine], shiito: IbentoShii
 		lines.append(line)
 
 
-static func paneru_to_file_text(lines: Array[IbentoFileLine], paneru: Paneru) -> void:
+static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -> void:
 	
 	#paneru.tip.reverse_into_paneru_params(paneru.params)
 	var line: IbentoFileLine = null
 	var word0: String = ""
 	var word1: String = ""
 
-	if true:
+	if paneru.komando_type == Komando.Type.INVALID:
+		word0 = "コマンドがエラー"
+		word1 = paneru.tipt_error
+		line = IbentoFileLine.new()
+		line.word0 = word0
+		line.word1 = word1
+		lines.append(line)
+	else:
 		word0 = "コマンド"
 		word1 = Komando.Type.keys()[paneru.komando_type]
 		line = IbentoFileLine.new()
 		line.word0 = word0
 		line.word1 = word1
 		lines.append(line)
-		
-	for i in range(0, paneru.params.size()):
-		var param: PaneruParam = paneru.params[i]
-		
+
+	if paneru.tip != null:
 		if paneru.tip.error_text != "":
 			word0 = "TIPエラー"
 			word1 = paneru.tip.error_text
+			line = IbentoFileLine.new()
+			line.word0 = word0
+			line.word1 = word1
+			lines.append(line)
+		
+	for i in range(0, paneru.params.size()):
+		var param: PaneruParam = paneru.params[i]
 
 		if param.param_type == PaneruParam.Type.INT:
 			word0 = "整数"

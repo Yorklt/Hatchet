@@ -1,6 +1,9 @@
 class_name IbentoFileReader
 extends Node
 
+# ファイルの読み込みから、Word0とWord1を経由して、KomandoTypeとPaneruParamuまで。
+
+
 static func read(
 		dst_result: Ibento,
 		path: String,
@@ -107,7 +110,7 @@ static func parse_paneru(dst_paneru: Paneru, lines: Array[IbentoFileLine], idx0:
 		var word0: String = lines[idx].word0
 		var word1: String = lines[idx].word1
 		if word0 == "コマンド":
-			dst_paneru.komando_text = word1
+			dst_paneru.komando_as_str = word1
 			dst_paneru.komando_type = Komando.parse_str(word1)
 		elif word0 == "整数":
 			if word1.is_valid_int() == true:

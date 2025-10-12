@@ -54,7 +54,10 @@ static func add_str_to_params(params: Array[PaneruParam], new_v_str: String) -> 
 static func create_guid(new_guid: GUID) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
 	param.param_type = PaneruParam.Type.GUID
-	param.v_str = new_guid.v_str
+	if new_guid != null:
+		param.v_str = new_guid.v_str
+	else:
+		param.v_str = "" # フェイルセーフ
 	return param
 
 

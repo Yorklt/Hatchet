@@ -105,7 +105,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	else:
 		text += "<<現フレーム>>"
 
-	return text + error_text
+	return text
 
 
 func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
@@ -123,16 +123,16 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 
 	word = edit_line.try_get_next_word()
 	if word != "call":
-		error_text += "callを期待したがcallではない。: " + word
+		error_text += "callを期待したがcallではない。: " + word + " "
 		return
 
 	word = edit_line.try_get_next_word()
 	if word == "":
-		error_text += "callの後でguid無しに終わっている。: " + word
+		error_text += "callの後でguid無しに終わっている。: " + word + " "
 		return
 	guid = GUID.try_parse_text(word)
 	if guid == null:
-		error_text += "callの後がguidでない。: " + word
+		error_text += "callの後がguidでない。: " + word + " "
 		return
 	
 	for i in range(0, 99):
@@ -153,7 +153,7 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 			does_begin_at_next_frame = false
 		else:
 			# エラー
-			error_text += "callの後に不明なワード: " + word
+			error_text += "callの後に不明なワード: " + word + " "
 			pass
 
 	line_idx += 1

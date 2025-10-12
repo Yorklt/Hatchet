@@ -121,7 +121,7 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 
 	word = edit_line.try_get_next_word()
 	if word != "msg":
-		error_text += "msgを期待したがmsgではない。: " + word
+		error_text += "msgを期待したがmsgではない。: " + word + " "
 		return
 	
 	for i in range(0, 99):
@@ -143,7 +143,7 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 			has_window = false
 		else:
 			# エラー
-			error_text += "msgの後に不明なワード: " + word
+			error_text += "msgの後に不明なワード: " + word + " "
 			pass
 
 	for i in range(0, 99):
