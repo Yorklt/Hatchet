@@ -20,7 +20,7 @@ var v_int: int = 0
 var v_float: float = 0.0
 var v_str: String = ""
 var v_jokens: Array[Joken] = []
-
+var error_text: String = ""
 
 static func create_int(new_v_int: int) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
@@ -33,11 +33,15 @@ static func add_int_to_params(params: Array[PaneruParam], new_v_int: int) -> voi
 	params.append(PaneruParam.create_int(new_v_int))
 
 
-static func create_float(new_v_float: int) -> PaneruParam:
+static func create_float(new_v_float: float) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
 	param.param_type = PaneruParam.Type.FLOAT
 	param.v_float = new_v_float
 	return param
+
+
+static func add_float_to_params(params: Array[PaneruParam], new_v_float: float) -> void:
+	params.append(PaneruParam.create_float(new_v_float))
 
 
 static func create_str(new_v_str: String) -> PaneruParam:
@@ -65,6 +69,33 @@ static func add_guid_to_params(params: Array[PaneruParam], new_guid: GUID) -> vo
 	params.append(PaneruParam.create_guid(new_guid))
 
 
+static func create_n_variable(new_name: String) -> PaneruParam:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.VARIABLE
+	param.v_str = new_name
+	return param
+
+
+static func add_variable_to_params(params: Array[PaneruParam], new_name: String) -> void:
+	params.append(PaneruParam.create_n_variable(new_name))
+
+
+static func create_hensu(new_hensu: Hensu) -> PaneruParam:
+	var param: PaneruParam = PaneruParam.new()
+	if new_hensu.h_type == Hensu.Type.N:
+		param.param_type = PaneruParam.Type.VARIABLE
+	elif new_hensu.h_type == Hensu.Type.L:
+		param.param_type = PaneruParam.Type.LOCAL
+	elif new_hensu.h_type == Hensu.Type.A:
+		param.param_type = PaneruParam.Type.ARRAY
+	param.v_str = new_hensu.to_text()
+	return param
+
+
+static func add_hensu_to_params(params: Array[PaneruParam], new_hensu: Hensu) -> void:
+	params.append(PaneruParam.create_hensu(new_hensu))
+
+
 static func is_type_literal(p_type: PaneruParam.Type) -> bool:
 	if p_type == PaneruParam.Type.INT:
 		return true
@@ -77,6 +108,91 @@ static func is_type_literal(p_type: PaneruParam.Type) -> bool:
 	if p_type == PaneruParam.Type.SUPOTTO:
 		return true
 	return false
+
+
+static func try_parse_edit_text(words: Array[String]) -> Array[PaneruParam]:
+
+	var params: Array[PaneruParam] = []
+
+	# 例
+	# "INT 6"
+	# param_type = INT, v_int = 6
+	# "LOCAL ポーションの数"
+	# param_type = LOCAL, v_str = "ポーションの数"
+
+	var idx: int = 0
+	for i in range(0, 99):
+		if idx > words.size() - 1:
+			break
+
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.INVALID
+
+		if idx + 1 > words.size() - 1:
+			# エラー
+			# wordが2つペアになっていない
+			param.error_text = "型と値のペアになっていない。"
+			break
+
+		var word0: String = words[idx + 0]
+		var word1: String = words[idx + 1]
+		idx += 2
+
+		if word0 == "INVALID":
+			param.param_type = PaneruParam.Type.INVALID
+
+		elif word0 == "INT":
+			param.param_type = PaneruParam.Type.INT
+			if word1.is_valid_int() == true:
+				param.v_int = word1.to_int()
+			else:
+				# エラー
+				param.error_text = "INTの後の値が解析できない。"
+
+		elif word0 == "FLOAT":
+			param.param_type = PaneruParam.Type.FLOAT
+			if word1.is_valid_float() == true:
+				param.v_float = word1.to_float()
+			else:
+				# エラー
+				param.error_text = "FLOATの後の値が解析できない。"
+
+		elif word0 == "STRING":
+			param.param_type = PaneruParam.Type.STRING
+			param.v_str = word1
+
+		elif word0 == "GUID":
+			param.param_type = PaneruParam.Type.GUID
+			var guid: GUID = GUID.try_parse_text(word1)
+			if guid != null:
+				param.v_str = guid.v_str
+			else:
+				# エラー
+				param.error_text = "GUIDの後の値が解析できない。"
+
+		elif word0 == "SUPOTTO":
+			param.param_type = PaneruParam.Type.GUID
+			param.v_str = word1
+
+		elif word0 == "VARIABLE":
+			param.param_type = PaneruParam.Type.VARIABLE
+			param.v_str = word1
+
+		elif word0 == "LOCAL":
+			param.param_type = PaneruParam.Type.LOCAL
+			param.v_str = word1
+
+		elif word0 == "ARRAY":
+			param.param_type = PaneruParam.Type.ARRAY
+			param.v_str = word1
+
+		elif word0 == "JOKEN_ARG":
+			param.param_type = PaneruParam.Type.JOKEN_ARG
+			param.v_str = word1 # TBD
+
+		params.append(param)
+
+	return params
 
 
 func to_text() -> String:
@@ -119,7 +235,5 @@ func to_text() -> String:
 		text += "JOKEN_ARG"
 		text += " "
 		text += "省略"
-
-
 
 	return text

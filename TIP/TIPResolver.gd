@@ -76,13 +76,23 @@ static func try_create_tip_by_komando(komando_type: Komando.Type) -> TIP:
 
 	return null
 
-static func try_solve_initial_word(word: String) -> Komando.Type:
+static func try_solve_initial_word(word0: String, word1: String, word2: String) -> Komando.Type:
 
 	# TIPが増えるたびにここに付け足す
-	if word == "//":
+	if word0 == "//":
 		return Komando.Type.COMMENT
-	if word == "msg":
+	if word1 == "=" or word1 == ":=":
+		if word0 != "" and word2 != "":
+			return Komando.Type.HLVARIABLE
+	if word0 == "if":
+		return Komando.Type.IFVARIABLE
+	if word0 == "msg":
 		return Komando.Type.MESSAGE
-	if word == "call":
+	if word0 == "call":
 		return Komando.Type.EXEC
+	if word0 == "[[コマンド]]":
+		# 未対応コマンドはファイル記載のコマンドをべた書きしている
+		# 例: [[コマンド]] FINALCOMBAT INT 3 FLOAT 0.2 FLOAT 0.1
+		return Komando.Type.KOMANDO
+
 	return Komando.Type.INVALID

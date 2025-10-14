@@ -84,6 +84,13 @@ func _ready() -> void:
 
 	_content_edit.syntax_highlighter = highlighter
 
+	var highlighter_file: CodeHighlighter = CodeHighlighter.new()
+	highlighter_file.number_color = Color.WHITE
+	highlighter_file.symbol_color = Color.WHITE
+	highlighter_file.function_color = Color.WHITE
+	highlighter_file.add_color_region("{{", "}}", Color.BURLYWOOD, false)
+	_ibento_file_edit.syntax_highlighter = highlighter_file
+
 
 func _on_filepath_line_edit_text_changed(_text: String) -> void:
 	_update_load_save_buttons()

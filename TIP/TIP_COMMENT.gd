@@ -52,13 +52,12 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 		error_text += "//を期待したが//ではない。: " + word + " "
 		return
 
-	word = edit_line.try_get_next_word()
-	if word == "":
-		comment_text = word # こういうこともある
+	# 行の残りを全部コメントとする
+	var length: int = edit_line.line.length() - 3
+	if length > 0:
+		comment_text = edit_line.line.right(length)
 	else:
-		comment_text = word
-
-	# TODO コメントにスペースが入ってても問題ないようにする
+		comment_text = "" # こういうこともある
 
 	line_idx += 1
 	dst_line_idx_next[0] = line_idx

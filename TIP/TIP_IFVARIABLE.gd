@@ -32,6 +32,33 @@ func transcript(
 	p_idx = p_idx_next[0]
 
 
+func reverse_into_paneru_params(
+		params: Array[PaneruParam],
+		) -> void:
+
+	# とりあえず短縮形は省略
+
+	# 左辺
+	if true:
+		PaneruParam.add_hensu_to_params(params, hensu_l)
+
+	# 左辺
+	if true:
+		if design_r.val_design_type == ValDesign.Type.LITERAL:
+			if design_r.chokuchi.c_type == Chokuchi.Type.INT:
+				PaneruParam.add_int_to_params(params, design_r.chokuchi.v_int)
+			if design_r.chokuchi.c_type == Chokuchi.Type.FLOAT:
+				PaneruParam.add_float_to_params(params, design_r.chokuchi.v_float)
+			if design_r.chokuchi.c_type == Chokuchi.Type.STRING:
+				PaneruParam.add_str_to_params(params, design_r.chokuchi.v_str)
+		if design_r.val_design_type == ValDesign.Type.HENSU:
+			PaneruParam.add_hensu_to_params(params, design_r.hensu)
+
+	# 代入演算子
+	if true:
+		PaneruParam.add_int_to_params(params, op_type)
+
+
 func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "if"
@@ -60,6 +87,65 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 
 	text += design_r.to_text()
 
-
-
 	return text
+
+
+static func _edit_word_to_op_type(word: String) -> int:
+	if word == "==":
+		return 0
+	if word == ">=":
+		return 1
+	if word == "<=":
+		return 2
+	if word == "!=":
+		return 3
+	if word == ">":
+		return 4
+	if word == "<":
+		return 5
+	return -1
+
+
+
+func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
+
+	dst_line_idx_next.resize(1)
+	dst_line_idx_next[0] = -1
+
+	var word: String = ""
+
+	var edit_line: TIPEditLine = null
+	
+	edit_line = edit_lines[line_idx]
+
+	if true:
+		word = edit_line.try_get_next_word()
+		if word != "if":
+			error_text += "ifを期待したがifではない。: " + word
+			return
+
+	if true:
+		word = edit_line.try_get_next_word()
+		var hensu: Hensu = Hensu.try_parse_text(word)
+		if hensu == null:
+			error_text += "左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg + " "
+			return
+		hensu_l = hensu
+
+	if true:
+		word = edit_line.try_get_next_word()
+		op_type = TIP_IFVARIABLE._edit_word_to_op_type(word)
+		if op_type < 0:
+			error_text += "変数の後の代入演算子が不明。: " + word + " "
+			return
+
+	if true:
+		word = edit_line.try_get_next_word()
+		var vd: ValDesign = ValDesign.try_parse_text(word)
+		if vd == null:
+			error_text += "左辺が値の指定（直地か変数）ではない。: " + word
+			return
+		design_r = vd
+
+	line_idx += 1
+	dst_line_idx_next[0] = line_idx

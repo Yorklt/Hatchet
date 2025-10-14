@@ -1,7 +1,7 @@
 class_name TIPTReader
 extends Node
 
-# TIPテキストからTIPEditLineを経由して、KomandoTypeとPaneruParamuまで。
+# TIPテキストからTIPEditLineを経由して、KomandoTypeとPaneruParamまで。
 
 
 
@@ -46,29 +46,47 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 			break
 		var edit_line: TIPEditLine = edit_lines[line_idx]
 
-		# 最初のワードを覗き見る
+		# 最初の3ワードを覗き見る
 		edit_line.loc = 0 # 位置を戻してやる
-		var word: String = edit_line.try_get_next_word()
+		var word0: String = edit_line.try_get_next_word()
+		var word1: String = edit_line.try_get_next_word()
+		var word2: String = edit_line.try_get_next_word()
 		edit_line.loc = 0 # 位置を戻してやる
-		if word == "": # 空業を飛ばしているのでありえないパス
-			line_idx += 1
-			continue
 
 		var paneru: Paneru = Paneru.new()
 		dst_panerus.append(paneru)
 
 		# コマンドを判別
-		var komando_type: Komando.Type = TIPResolver.try_solve_initial_word(word)
+		var komando_type: Komando.Type = TIPResolver.try_solve_initial_word(word0, word1, word2)
 		if komando_type == Komando.Type.INVALID:
 			# 未対応コマンド、または複数行にわたる未判定コマンドの後の行、またはただの判別不能
 			paneru.komando_as_str = "?"
 			paneru.komando_type = Komando.Type.INVALID
-			paneru.tipt_error = "行の最初のワードが不明: " + word
+			paneru.tipt_error = "行が解釈不能: " + edit_line.line
 			line_idx += 1
 			continue
-		paneru.komando_type = komando_type
-		var komando_as_str: String = Komando.Type.keys()[komando_type]
-		paneru.komando_as_str = komando_as_str
+		elif komando_type == Komando.Type.KOMANDO:
+			# [[コマンド]]の後に、べた書きしたコマンド名が書かれている
+			paneru.komando_as_str = word1
+			paneru.komando_type = Komando.Type.KOMANDO
+			
+			edit_line.try_get_next_word() # [[コマンド]]
+			edit_line.try_get_next_word() # FINALCOMBAT等
+			var words: Array[String] = []
+			for k in range(0, 99):
+				var word: String = edit_line.try_get_next_word()
+				if word == "":
+					break
+				words.append(word)
+			var params: Array[PaneruParam] =  PaneruParam.try_parse_edit_text(words)
+			for k in range(0, params.size()):
+				paneru.params.append(params[k])
+			line_idx += 1
+			continue
+
+		else:
+			paneru.komando_type = komando_type
+			paneru.komando_as_str = Komando.Type.keys()[komando_type]
 
 		# 複数行をTIPパラメータに変換
 		var tip: TIP = TIPResolver.try_create_tip_by_komando(komando_type)

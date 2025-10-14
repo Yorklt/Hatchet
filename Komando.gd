@@ -4,6 +4,7 @@ extends RefCounted
 enum Type
 {
 	INVALID,
+	KOMANDO, # べた書き
 	COMMENT,
 	HLVARIABLE,
 	IFVARIABLE,
@@ -35,7 +36,7 @@ enum Type
 	BOSSBATTLE,
 }
 
-static func parse_str(text: String) -> Komando.Type:
+static func parse_file_text(text: String) -> Komando.Type:
 	for i in range(0, Komando.Type.keys().size()):
 		if text == Komando.Type.keys()[i]:
 			return Komando.Type.values()[i] as Komando.Type

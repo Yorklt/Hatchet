@@ -1,7 +1,7 @@
 class_name TIPTWriter
 extends Node
 
-# KomandoTypeとPaneruParamuから、TIPテキストまで。
+# KomandoTypeとPaneruParamから、TIPテキストまで。
 
 
 static func panerus_to_tip_text(dst_text: Array[String], panerus: Array[Paneru]) -> void:

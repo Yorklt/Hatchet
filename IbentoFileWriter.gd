@@ -1,7 +1,7 @@
 class_name IbentoFileWriter
 extends Node
 
-# KomandoTypeとPaneruParamuから、Word0とWord1を経由して、ファイルの書き込みまで。
+# KomandoTypeとPaneruParamから、Word0とWord1を経由して、ファイルの書き込みまで。
 
 
 static func write(
@@ -72,8 +72,16 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 	var word1: String = ""
 
 	if paneru.komando_type == Komando.Type.INVALID:
-		word0 = "コマンドがエラー"
-		word1 = paneru.tipt_error
+		word0 = "{{コマンドエラー}}"
+		word1 = "{{" + paneru.tipt_error + "}}"
+		line = IbentoFileLine.new()
+		line.word0 = word0
+		line.word1 = word1
+		lines.append(line)
+	elif paneru.komando_type == Komando.Type.KOMANDO:
+		# べた書きコマンドは右から左に流す
+		word0 = "コマンド"
+		word1 = paneru.komando_as_str
 		line = IbentoFileLine.new()
 		line.word0 = word0
 		line.word1 = word1
@@ -88,8 +96,8 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 
 	if paneru.tip != null:
 		if paneru.tip.error_text != "":
-			word0 = "TIPエラー"
-			word1 = paneru.tip.error_text
+			word0 = "{TIPエラー}}"
+			word1 = "{{" + paneru.tip.error_text + "}}"
 			line = IbentoFileLine.new()
 			line.word0 = word0
 			line.word1 = word1
@@ -126,7 +134,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 		line.word1 = word1
 		lines.append(line)
 
-	if true:
+	if paneru.komando_type != Komando.Type.INVALID:
 		word0 = "コマンド終了"
 		word1 = ""
 		line = IbentoFileLine.new()
