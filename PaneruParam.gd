@@ -22,78 +22,75 @@ var v_str: String = ""
 var v_jokens: Array[Joken] = []
 var error_text: String = ""
 
-static func create_int(new_v_int: int) -> PaneruParam:
+
+static func add_int_to_params(params: Array[PaneruParam], new_v_int: int) -> void:
 	var param: PaneruParam = PaneruParam.new()
 	param.param_type = PaneruParam.Type.INT
 	param.v_int = new_v_int
-	return param
-
-
-static func add_int_to_params(params: Array[PaneruParam], new_v_int: int) -> void:
-	params.append(PaneruParam.create_int(new_v_int))
-
-
-static func create_float(new_v_float: float) -> PaneruParam:
-	var param: PaneruParam = PaneruParam.new()
-	param.param_type = PaneruParam.Type.FLOAT
-	param.v_float = new_v_float
-	return param
+	params.append(param)
 
 
 static func add_float_to_params(params: Array[PaneruParam], new_v_float: float) -> void:
-	params.append(PaneruParam.create_float(new_v_float))
-
-
-static func create_str(new_v_str: String) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
-	param.param_type = PaneruParam.Type.STRING
-	param.v_str = new_v_str
-	return param
+	param.param_type = PaneruParam.Type.FLOAT
+	param.v_float = new_v_float
+	params.append(param)
 
 
 static func add_str_to_params(params: Array[PaneruParam], new_v_str: String) -> void:
-	params.append(PaneruParam.create_str(new_v_str))
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.STRING
+	param.v_str = new_v_str
+	params.append(param)
 
 
-static func create_guid(new_guid: GUID) -> PaneruParam:
+static func add_guid_to_params(params: Array[PaneruParam], new_guid: GUID) -> void:
 	var param: PaneruParam = PaneruParam.new()
 	param.param_type = PaneruParam.Type.GUID
 	if new_guid != null:
 		param.v_str = new_guid.v_str
 	else:
 		param.v_str = "" # フェイルセーフ
-	return param
-
-
-static func add_guid_to_params(params: Array[PaneruParam], new_guid: GUID) -> void:
-	params.append(PaneruParam.create_guid(new_guid))
-
-
-static func create_n_variable(new_name: String) -> PaneruParam:
-	var param: PaneruParam = PaneruParam.new()
-	param.param_type = PaneruParam.Type.VARIABLE
-	param.v_str = new_name
-	return param
+	params.append(param)
 
 
 static func add_variable_to_params(params: Array[PaneruParam], new_name: String) -> void:
-	params.append(PaneruParam.create_n_variable(new_name))
-
-
-static func create_hensu(new_hensu: Hensu) -> PaneruParam:
 	var param: PaneruParam = PaneruParam.new()
-	if new_hensu.h_type == Hensu.Type.N:
-		param.param_type = PaneruParam.Type.VARIABLE
-	elif new_hensu.h_type == Hensu.Type.L:
-		param.param_type = PaneruParam.Type.LOCAL
-	elif new_hensu.h_type == Hensu.Type.A:
-		param.param_type = PaneruParam.Type.ARRAY
-	param.v_str = new_hensu.to_text()
-	return param
+	param.param_type = PaneruParam.Type.VARIABLE
+	param.v_str = new_name
+	params.append(param)
 
 
 static func add_hensu_to_params(params: Array[PaneruParam], new_hensu: Hensu) -> void:
-	params.append(PaneruParam.create_hensu(new_hensu))
+	
+	# TODO ここの処理はHensuクラスにやらせるのが筋
+	if new_hensu.h_type == Hensu.Type.N:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.VARIABLE
+		param.v_str = new_hensu.h_name
+		params.append(param)
+	elif new_hensu.h_type == Hensu.Type.L:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.LOCAL
+		param.v_str = new_hensu.h_name
+		params.append(param)
+	elif new_hensu.h_type == Hensu.Type.A:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.ARRAY	
+		param.v_str = new_hensu.h_name
+		params.append(param)
+		if new_hensu.idx_type == Hensu.Type.I:
+			var param2: PaneruParam = PaneruParam.new()
+			param2.param_type = PaneruParam.Type.INT
+			params.append(param2)
+		else:
+			var param2: PaneruParam = PaneruParam.new()
+			if new_hensu.idx_type == Hensu.Type.N:
+				param2.param_type = PaneruParam.Type.VARIABLE
+			if new_hensu.idx_type == Hensu.Type.L:
+				param2.param_type = PaneruParam.Type.LOCAL			
+			param2.v_str = new_hensu.idx_h_name
+			params.append(param2)
 
 
 static func is_type_literal(p_type: PaneruParam.Type) -> bool:

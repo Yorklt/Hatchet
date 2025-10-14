@@ -41,7 +41,6 @@ func transcript(
 	else:
 		error_text += "ウィンドウの有無が不明"
 
-
 func reverse_into_paneru_params(
 		params: Array[PaneruParam],
 		) -> void:

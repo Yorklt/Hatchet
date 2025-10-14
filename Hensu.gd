@@ -124,16 +124,20 @@ static func try_parse_text(text: String) -> Hensu:
 				var hensu: Hensu = Hensu.new()
 				hensu.h_type = Hensu.Type.A
 
+				# 配列変数の名前
+				var h_str: String = text.substr(0, b0)
+				hensu.h_name = h_str
+
 				# 添え字
 				# 例えば、xxxxx[xxx]なら [が5で、]が9、6から長さ3
 				var idx_str: String = text.substr(b0 + 1, b1 - b0 - 1)
 				if idx_str.length() >= 3 and idx_str.left(2) == "N:": # N:x なので最低3文字
 					hensu.idx_type = Hensu.Type.N
-					hensu.idx_h_name = text
+					hensu.idx_h_name = idx_str
 					return hensu
 				elif idx_str.length() >= 3 and idx_str.left(2) == "L:":
 					hensu.idx_type = Hensu.Type.L
-					hensu.idx_h_name = text
+					hensu.idx_h_name = idx_str
 					return hensu
 				elif idx_str.is_valid_int() == true:
 					hensu.idx_type = Hensu.Type.I
