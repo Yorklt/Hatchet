@@ -60,7 +60,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	text += " "
 	text += moshon_name
 	text += " "
-	text += trans_time.to_text()
+	text += trans_time.to_edit_text()
 	
 	if keep_until_finish == true:
 		text += " "

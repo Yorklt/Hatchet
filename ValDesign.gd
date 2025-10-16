@@ -34,25 +34,34 @@ static func parse_paneru_params(dst_p_idx_next: Array[int], params: Array[Paneru
 	return vd
 
 
-func to_text() -> String:
+func add_to_paneru_params(params: Array[PaneruParam]) -> void:
+	
+	if val_design_type == ValDesign.Type.LITERAL:
+		chokuchi.add_to_paneru_params(params)
+	
+	if val_design_type == ValDesign.Type.HENSU:
+		hensu.add_to_paneru_params(params)
+
+
+func to_edit_text() -> String:
 	var text: String = ""
 	if val_design_type == ValDesign.Type.LITERAL:
-		text += chokuchi.to_text()
+		text += chokuchi.to_edit_text()
 	else:
-		text += hensu.to_text()
+		text += hensu.to_edit_text()
 
 	return text
 
 
-static func try_parse_text(text: String) -> ValDesign:
+static func try_parse_edit_text(text: String) -> ValDesign:
 	var vd: ValDesign = null
-	var new_chokuchi: Chokuchi = Chokuchi.try_parse_text(text)
+	var new_chokuchi: Chokuchi = Chokuchi.try_parse_edit_text(text)
 	if new_chokuchi != null:
 		vd = ValDesign.new()
 		vd.val_design_type = ValDesign.Type.LITERAL
 		vd.chokuchi = new_chokuchi
 		return vd
-	var new_hensu: Hensu = Hensu.try_parse_text(text)
+	var new_hensu: Hensu = Hensu.try_parse_edit_text(text)
 	if new_chokuchi != null:
 		vd = ValDesign.new()
 		vd.val_design_type = ValDesign.Type.HENSU

@@ -37,22 +37,89 @@ func transcript(
 				p_idx = p_idx_next[0]
 
 
+func reverse_into_paneru_params(
+		params: Array[PaneruParam],
+		) -> void:
+
+	# 回数
+	if count != null:
+		PaneruParam.add_val_design_to_params(params, count)
+	else:
+		# 無限ループはゼロ
+		PaneruParam.add_int_to_params(params, 0)
+
+	# カウンタ
+	if counter != null:
+		PaneruParam.add_hensu_to_params(params, counter)
+
+	# 初期値
+	if init_val != null:
+		PaneruParam.add_val_design_to_params(params, init_val)
+
+
 func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "loop"
-	text += " "
 
 	if counter != null:
 		text += " "
-		text += counter.to_text()
+		text += "for"
+		text += " "
+		text += counter.to_edit_text()
 	if init_val != null:
 		text += " "
 		text += "from"
 		text += " "
-		text += init_val.to_text()
+		text += init_val.to_edit_text()
 	if count != null:
 		text += " "
 		text += "times"
 		text += " "
-		text += count.to_text()
+		text += count.to_edit_text()
 	return text
+
+
+func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+
+	# loop times 10
+	# loop for L:i times 10
+	# loop for L:i from N:初期値 times N:回数
+
+	var word: String = ""
+	var edit_line: TIPEditLine = null
+	edit_line = edit_lines[line_idx]
+
+	word = edit_line.try_get_next_word()
+	if word != "loop":
+		error_text += "loopを期待したがcallではない。: " + word
+		return -1
+
+	for i in range(0, 99):
+		word = edit_line.try_get_next_word()
+		if word == "":
+			break
+
+		if word != "for":
+			word = edit_line.try_get_next_word()
+			counter = Hensu.try_parse_edit_text(word)
+			if counter == null:
+				error_text += "forの後が変数ではない。: " + word
+				return -1
+		elif word != "from":
+			word = edit_line.try_get_next_word()
+			init_val = ValDesign.try_parse_edit_text(word)
+			if init_val == null:
+				error_text += "fromの後が直地でも変数でもない。: " + word
+				return -1
+		elif word != "times":
+			word = edit_line.try_get_next_word()
+			count = ValDesign.try_parse_edit_text(word)
+			if count == null:
+				error_text += "timesの後が直地でも変数でもない。: " + word
+				return -1
+		else:
+			error_text += "loopのパラメータが不明（forでもfromでもtimesでもない）。: " + word
+			return -1
+
+	line_idx += 1
+	return line_idx

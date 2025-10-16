@@ -67,7 +67,40 @@ static func parse_paneru_params(p_idx_next: Array[int], params: Array[PaneruPara
 	return hensu
 
 
-func to_text() -> String:
+func add_to_paneru_params(params: Array[PaneruParam]) -> void:
+	
+	if h_type == Hensu.Type.N:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.VARIABLE
+		param.v_str = h_name
+		params.append(param)
+
+	elif h_type == Hensu.Type.L:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.LOCAL
+		param.v_str = h_name
+		params.append(param)
+
+	elif h_type == Hensu.Type.A:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.ARRAY	
+		param.v_str = h_name
+		params.append(param)
+		if idx_type == Hensu.Type.I:
+			var param2: PaneruParam = PaneruParam.new()
+			param2.param_type = PaneruParam.Type.INT
+			params.append(param2)
+		else:
+			var param2: PaneruParam = PaneruParam.new()
+			if idx_type == Hensu.Type.N:
+				param2.param_type = PaneruParam.Type.VARIABLE
+			if idx_type == Hensu.Type.L:
+				param2.param_type = PaneruParam.Type.LOCAL			
+			param2.v_str = idx_h_name
+			params.append(param2)
+
+
+func to_edit_text() -> String:
 	var text: String = ""
 	if h_type == Hensu.Type.N:
 		if h_name.left(2) != "N:":
@@ -103,7 +136,7 @@ func to_text() -> String:
 	return text
 
 
-static func try_parse_text(text: String) -> Hensu:
+static func try_parse_edit_text(text: String) -> Hensu:
 	
 	if text.length() >= 3: # L:x なので最低3文字
 		if text.left(2) == "N:":

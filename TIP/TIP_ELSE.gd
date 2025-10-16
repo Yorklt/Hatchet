@@ -9,6 +9,11 @@ func transcript(
 	block_type = TIP.BlockType.CONTINUE
 
 
+func reverse_into_paneru_params(
+		_params: Array[PaneruParam],
+		) -> void:
+	return
+
 func to_edit_lines(last_begin: Komando.Type) -> String:
 	var text: String = ""
 
@@ -18,3 +23,18 @@ func to_edit_lines(last_begin: Komando.Type) -> String:
 		text += "else"
 
 	return text
+
+func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+
+	var word: String = ""
+	var edit_line: TIPEditLine = null
+	edit_line = edit_lines[line_idx]
+
+	word = edit_line.try_get_next_word()
+	if word != "else" and word != "defeated":
+		error_text += "elseでもdefeatedでもない。: " + word + " "
+		return -1
+
+	line_idx += 1
+
+	return line_idx

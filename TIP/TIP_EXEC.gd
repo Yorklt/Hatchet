@@ -108,32 +108,27 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
-
-	dst_line_idx_next.resize(1)
-	dst_line_idx_next[0] = -1
+func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 #	"call" guid opt( "<<完了待つ>>" "<<完了待たず>>" .... )
 
 	var word: String = ""
-
 	var edit_line: TIPEditLine = null
-	
 	edit_line = edit_lines[line_idx]
 
 	word = edit_line.try_get_next_word()
 	if word != "call":
 		error_text += "callを期待したがcallではない。: " + word + " "
-		return
+		return -1
 
 	word = edit_line.try_get_next_word()
 	if word == "":
 		error_text += "callの後でguid無しに終わっている。: " + word + " "
-		return
+		return -1
 	guid = GUID.try_parse_text(word)
 	if guid == null:
 		error_text += "callの後がguidでない。: " + word + " "
-		return
+		return -1
 	
 	for i in range(0, 99):
 		word = edit_line.try_get_next_word()
@@ -157,4 +152,5 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 			pass
 
 	line_idx += 1
-	dst_line_idx_next[0] = line_idx
+
+	return line_idx

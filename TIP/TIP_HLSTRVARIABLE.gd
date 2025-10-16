@@ -62,7 +62,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	text += "[[文字列操作]]"
 
 	text += " "
-	text += lhs_hensu.to_text()
+	text += lhs_hensu.to_edit_text()
 
 	if store_type == TIP_HLSTRVARIABLE.StoreType.OVERWRITE:
 		text += " "
@@ -77,7 +77,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	if rhs_type == 0:
 		# 変数
 		text += " "
-		text += rhs_hensu.to_text()
+		text += rhs_hensu.to_edit_text()
 	else:
 		# その他の右辺は面倒見切れない
 		text += " "
@@ -86,6 +86,6 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		text += "%d" % rhs_type
 		for i in range(0, rhs_params.size()):
 			text += " "
-			text += rhs_params[i].to_text()
+			text += rhs_params[i].to_edit_text()
 
 	return text

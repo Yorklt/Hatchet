@@ -76,6 +76,8 @@ static func try_create_tip_by_komando(komando_type: Komando.Type) -> TIP:
 
 	return null
 
+
+# 最初の3ワードからコマンドを判断する
 static func try_solve_initial_word(word0: String, word1: String, word2: String) -> Komando.Type:
 
 	# TIPが増えるたびにここに付け足す
@@ -86,6 +88,14 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 			return Komando.Type.HLVARIABLE
 	if word0 == "if":
 		return Komando.Type.IFVARIABLE
+	if word0 == "else" or word0 == "defeated":
+		return Komando.Type.ELSE
+	if word0 == "endif" or word0 == "endpick" or word0 == "endex" or word0 == "endcombat" or word0 == "end???":
+		return Komando.Type.ENDIF
+	if word0 == "loop":
+		return Komando.Type.LOOP
+	if word0 == "endloop":
+		return Komando.Type.ENDLOOP
 	if word0 == "msg":
 		return Komando.Type.MESSAGE
 	if word0 == "call":

@@ -41,9 +41,9 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	text += " "
 
 	if jump_type == TIP_JUMP.Type.BY_COHKUCHI:
-		text += label_num_chokuchi.to_text()
+		text += label_num_chokuchi.to_edit_text()
 
 	if jump_type == TIP_JUMP.Type.BY_HENSU:
-		text += label_num_hensu.to_text()
+		text += label_num_hensu.to_edit_text()
 
 	return text

@@ -46,7 +46,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		text += " "
 		text += "<<所持アイテム>>"
 		text += " "
-		text += loc_in_inventory.to_text()
+		text += loc_in_inventory.to_edit_text()
 
 	if change_type == 1:
 		text += " "
@@ -59,7 +59,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		text += "<<増減不明>>"
 
 	text += " "
-	text += sub_count.to_text()
+	text += sub_count.to_edit_text()
 
 	return text
 

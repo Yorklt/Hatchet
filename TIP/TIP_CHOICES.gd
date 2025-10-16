@@ -102,7 +102,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 
 	for i in range(0, branch_count):
 
-		var item_text = item_params[i].text
+		var item_text: String = item_params[i].text
 		if item_text == "%%WhenCancel%%":
 			text += "<<キャンセル専用分岐>>"
 		else:

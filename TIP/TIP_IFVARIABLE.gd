@@ -64,7 +64,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	text += "if"
 	text += " "
 
-	text += hensu_l.to_text()
+	text += hensu_l.to_edit_text()
 
 	var op_text: String = ""
 	if op_type < 0:
@@ -85,7 +85,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		op_text += " <OP不明> "
 	text += op_text
 
-	text += design_r.to_text()
+	text += design_r.to_edit_text()
 
 	return text
 
@@ -107,29 +107,24 @@ static func _edit_word_to_op_type(word: String) -> int:
 
 
 
-func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
-
-	dst_line_idx_next.resize(1)
-	dst_line_idx_next[0] = -1
+func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
-
 	var edit_line: TIPEditLine = null
-	
 	edit_line = edit_lines[line_idx]
 
 	if true:
 		word = edit_line.try_get_next_word()
 		if word != "if":
 			error_text += "ifを期待したがifではない。: " + word
-			return
+			return -1
 
 	if true:
 		word = edit_line.try_get_next_word()
-		var hensu: Hensu = Hensu.try_parse_text(word)
+		var hensu: Hensu = Hensu.try_parse_edit_text(word)
 		if hensu == null:
 			error_text += "左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg + " "
-			return
+			return -1
 		hensu_l = hensu
 
 	if true:
@@ -137,15 +132,16 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 		op_type = TIP_IFVARIABLE._edit_word_to_op_type(word)
 		if op_type < 0:
 			error_text += "変数の後の代入演算子が不明。: " + word + " "
-			return
+			return -1
 
 	if true:
 		word = edit_line.try_get_next_word()
-		var vd: ValDesign = ValDesign.try_parse_text(word)
+		var vd: ValDesign = ValDesign.try_parse_edit_text(word)
 		if vd == null:
 			error_text += "左辺が値の指定（直地か変数）ではない。: " + word
-			return
+			return -1
 		design_r = vd
 
 	line_idx += 1
-	dst_line_idx_next[0] = line_idx
+	
+	return line_idx

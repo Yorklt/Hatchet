@@ -17,7 +17,7 @@ func to_edit_lines(last_begin: Komando.Type) -> String:
 		text += " "
 		for i in range(0, params.size()):
 			text += " "
-			text += params[i].to_text()
+			text += params[i].to_edit_text()
 	else:
 		text = tip.to_edit_lines(last_begin)
 		# エラーがあれば

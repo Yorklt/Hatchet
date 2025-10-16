@@ -22,6 +22,6 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	var text: String = ""
 	text += "wait"
 	text += " "
-	text += time.to_text()
+	text += time.to_edit_text()
 
 	return text

@@ -39,7 +39,28 @@ static func parse_paneru_params(params: Array[PaneruParam], p_idx: int) -> Choku
 	return chokuchi
 
 
-func to_text() -> String:
+func add_to_paneru_params(params: Array[PaneruParam]) -> void:
+	
+	if c_type == Chokuchi.Type.INT:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.INT
+		param.v_int = v_int
+		params.append(param)
+	
+	if c_type == Chokuchi.Type.FLOAT:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.FLOAT
+		param.v_float = v_float
+		params.append(param)
+	
+	if c_type == Chokuchi.Type.STRING:
+		var param: PaneruParam = PaneruParam.new()
+		param.param_type = PaneruParam.Type.STRING
+		param.v_str = v_str
+		params.append(param)
+
+
+func to_edit_text() -> String:
 	var text: String = ""
 	if c_type == Chokuchi.Type.INT:
 		text += "%d" % v_int
@@ -60,15 +81,15 @@ func to_text() -> String:
 	return text
 
 
-static func try_parse_text(text: String) -> Chokuchi:
+static func try_parse_edit_text(text: String) -> Chokuchi:
 	var chokuchi: Chokuchi = null
-	chokuchi = Chokuchi.try_parse_text_to_int(text)
+	chokuchi = Chokuchi.try_parse_edit_text_to_int(text)
 	if chokuchi != null:
 		return chokuchi
-	chokuchi = Chokuchi.try_parse_text_to_float(text)
+	chokuchi = Chokuchi.try_parse_edit_text_to_float(text)
 	if chokuchi != null:
 		return chokuchi
-	chokuchi = Chokuchi.try_parse_text_to_string(text)
+	chokuchi = Chokuchi.try_parse_edit_text_to_string(text)
 	if chokuchi != null:
 		return chokuchi
 	#chokuchi = Chokuchi.try_parse_text_to_guid(text)
@@ -80,7 +101,7 @@ static func try_parse_text(text: String) -> Chokuchi:
 	return null
 
 
-static func try_parse_text_to_int(text: String) -> Chokuchi:
+static func try_parse_edit_text_to_int(text: String) -> Chokuchi:
 	if text.is_valid_int() == true:
 		var chokuchi: Chokuchi = Chokuchi.new()
 		chokuchi.c_type = Chokuchi.Type.INT
@@ -89,7 +110,7 @@ static func try_parse_text_to_int(text: String) -> Chokuchi:
 	return null
 
 
-static func try_parse_text_to_float(text: String) -> Chokuchi:
+static func try_parse_edit_text_to_float(text: String) -> Chokuchi:
 	# 例えば"3.14f"
 	if text.right(1) == "f":
 		text = text.substr(0, text.length() - 1)
@@ -101,7 +122,7 @@ static func try_parse_text_to_float(text: String) -> Chokuchi:
 	return null
 
 
-static func try_parse_text_to_string(text: String) -> Chokuchi:
+static func try_parse_edit_text_to_string(text: String) -> Chokuchi:
 	# ダブルクォーテーションで囲まれている
 	if text.length() >= 2 and text.left(1) == "\"" and text.right(1) == "\"":
 		var chokuchi: Chokuchi = Chokuchi.new()

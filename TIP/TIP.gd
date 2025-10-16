@@ -34,9 +34,7 @@ func reverse_into_paneru_params(
 
 
 func from_edit_lines(
-		dst_line_idx_next: Array[int],
 		_edit_lines: Array[TIPEditLine],
-		line_idx: int,
-		) -> void:
-	dst_line_idx_next.resize(1)
-	dst_line_idx_next[0] = line_idx + 1
+		_line_idx: int,
+		) -> int:
+	return -1

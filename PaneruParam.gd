@@ -62,35 +62,15 @@ static func add_variable_to_params(params: Array[PaneruParam], new_name: String)
 
 
 static func add_hensu_to_params(params: Array[PaneruParam], new_hensu: Hensu) -> void:
-	
-	# TODO ここの処理はHensuクラスにやらせるのが筋
-	if new_hensu.h_type == Hensu.Type.N:
-		var param: PaneruParam = PaneruParam.new()
-		param.param_type = PaneruParam.Type.VARIABLE
-		param.v_str = new_hensu.h_name
-		params.append(param)
-	elif new_hensu.h_type == Hensu.Type.L:
-		var param: PaneruParam = PaneruParam.new()
-		param.param_type = PaneruParam.Type.LOCAL
-		param.v_str = new_hensu.h_name
-		params.append(param)
-	elif new_hensu.h_type == Hensu.Type.A:
-		var param: PaneruParam = PaneruParam.new()
-		param.param_type = PaneruParam.Type.ARRAY	
-		param.v_str = new_hensu.h_name
-		params.append(param)
-		if new_hensu.idx_type == Hensu.Type.I:
-			var param2: PaneruParam = PaneruParam.new()
-			param2.param_type = PaneruParam.Type.INT
-			params.append(param2)
-		else:
-			var param2: PaneruParam = PaneruParam.new()
-			if new_hensu.idx_type == Hensu.Type.N:
-				param2.param_type = PaneruParam.Type.VARIABLE
-			if new_hensu.idx_type == Hensu.Type.L:
-				param2.param_type = PaneruParam.Type.LOCAL			
-			param2.v_str = new_hensu.idx_h_name
-			params.append(param2)
+	new_hensu.add_to_paneru_params(params)
+
+
+static func add_chokuchi_to_params(params: Array[PaneruParam], new_chokuchi: Chokuchi) -> void:
+	new_chokuchi.add_to_paneru_params(params)
+
+
+static func add_val_design_to_params(params: Array[PaneruParam], new_vd: ValDesign) -> void:
+	new_vd.add_to_paneru_params(params)
 
 
 static func is_type_literal(p_type: PaneruParam.Type) -> bool:
@@ -192,7 +172,7 @@ static func try_parse_edit_text(words: Array[String]) -> Array[PaneruParam]:
 	return params
 
 
-func to_text() -> String:
+func to_edit_text() -> String:
 	var text: String = ""
 	if param_type == PaneruParam.Type.INVALID:
 		text += "INVALID"

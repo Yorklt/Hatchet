@@ -96,12 +96,11 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 			line_idx += 1
 			continue
 		paneru.tip = tip
-		var line_idx_next: Array[int] = []
-		tip.from_edit_lines(line_idx_next, edit_lines, line_idx)
-		if line_idx_next[0] < 0: # TIPTエラー
+		var line_idx_next: int = tip.from_edit_lines(edit_lines, line_idx)
+		if line_idx_next < 0: # TIPTエラー
 			line_idx += 1
 			continue
-		line_idx = line_idx_next[0]
+		line_idx = line_idx_next
 
 		# TIPパラメータをPaneruParamにする
 		paneru.tip.reverse_into_paneru_params(paneru.params)

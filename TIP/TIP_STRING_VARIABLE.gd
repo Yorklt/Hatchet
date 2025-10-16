@@ -58,7 +58,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 
 	if lhs_type == 0:
 		text += " "
-		text += lhs_hensu.to_text()
+		text += lhs_hensu.to_edit_text()
 	else:
 		text += " "
 		text += "<<特殊>>"

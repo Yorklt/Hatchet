@@ -111,14 +111,14 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	if dir_type == 10:
 		text += "<<指定方向>>"
 		text += " "
-		text += spec_angle.to_text()
+		text += spec_angle.to_edit_text()
 	
 	if force_cardinal == true:
 		text += " "
 		text += "<<四方のみ>>"
 	
 	text += " "
-	text += move_length.to_text()
+	text += move_length.to_edit_text()
 
 	if keep_dirction == true:
 		text += " "

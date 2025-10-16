@@ -82,20 +82,20 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		else:
 			text += "<<指定マップ>>"
 			text += " "
-			text += mappu_id.to_text()
+			text += mappu_id.to_edit_text()
 	
 		text += " "
 		text += "("
 		text += " "
-		text += pos_x.to_text()
+		text += pos_x.to_edit_text()
 		if auto_y == true:
 			text += " "
 			text += "<<自動Y>>"
 		else:
 			text += " "
-			text += pos_y.to_text()
+			text += pos_y.to_edit_text()
 		text += " "
-		text += pos_z.to_text()
+		text += pos_z.to_edit_text()
 		text += ")"
 
 	text += " "

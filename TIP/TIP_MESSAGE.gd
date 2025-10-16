@@ -103,25 +103,20 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLine], line_idx: int) -> void:
-
-	dst_line_idx_next.resize(1)
-	dst_line_idx_next[0] = -1
+func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	# msg <<上>>
 	# "こんにちは。"
 	# "いい天気ですね。"
 
 	var word: String = ""
-
 	var edit_line: TIPEditLine = null
-	
 	edit_line = edit_lines[line_idx]
 
 	word = edit_line.try_get_next_word()
 	if word != "msg":
 		error_text += "msgを期待したがmsgではない。: " + word + " "
-		return
+		return -1
 	
 	for i in range(0, 99):
 		word = edit_line.try_get_next_word()
@@ -160,4 +155,4 @@ func from_edit_lines(dst_line_idx_next: Array[int], edit_lines: Array[TIPEditLin
 			edit_line.loc = 0 # 次のパネルのために戻してあげる
 			break
 
-	dst_line_idx_next[0] = line_idx
+	return line_idx
