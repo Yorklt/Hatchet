@@ -62,7 +62,7 @@ static func try_parse_edit_text(text: String) -> ValDesign:
 		vd.chokuchi = new_chokuchi
 		return vd
 	var new_hensu: Hensu = Hensu.try_parse_edit_text(text)
-	if new_chokuchi != null:
+	if new_hensu != null:
 		vd = ValDesign.new()
 		vd.val_design_type = ValDesign.Type.HENSU
 		vd.hensu = new_hensu

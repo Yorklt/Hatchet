@@ -8,11 +8,16 @@ var _save_button: Button = null
 var _shiito_list: ItemList = null
 var _content_edit: TextEdit = null
 var _reverse_button: Button = null
+var _auto_reverse_check_button: CheckButton = null
 var _ibento_file_edit: TextEdit = null
 var _file_dialog: FileDialog = null
 
 var _ibento: Ibento = null
 
+var _edit_shiito_idx: int = -1
+var _does_auto_reverse: bool = true
+var _is_content_edited: bool = false
+var _content_edit_time: float = 0.0
 
 
 func _ready() -> void:
@@ -24,8 +29,9 @@ func _ready() -> void:
 	_save_button = $SaveButton as Button
 	_shiito_list = $ShiitoList as ItemList
 	_content_edit = $HSplitContainer/ContentEdit as TextEdit
-	_reverse_button = $HSplitContainer/RightArea/ReverseButton as Button
-	_ibento_file_edit = $HSplitContainer/RightArea/IbentoFileText as TextEdit
+	_reverse_button = $HSplitContainer/RightArea/VSplitContainer/RightBottomArea/ReverseButton as Button
+	_auto_reverse_check_button = $HSplitContainer/RightArea/VSplitContainer/RightBottomArea/AutoReverseCheckButton as CheckButton
+	_ibento_file_edit = $HSplitContainer/RightArea/VSplitContainer/RightBottomArea/IbentoFileText as TextEdit
 
 	# ファイルパスの入力欄
 	_filepath_line_edit.text_changed.connect(_on_filepath_line_edit_text_changed)
@@ -42,9 +48,15 @@ func _ready() -> void:
 
 	# 内容エディタ
 	_content_edit.editable = false
+	_content_edit.lines_edited_from.connect(_on_content_edit_lines_edited_from)
 
 	# 変換ボタン
 	_reverse_button.pressed.connect(_on_reverse_button_pressed)
+
+	# 自動変換チェックボックス
+	_does_auto_reverse = true
+	_auto_reverse_check_button.button_pressed = _does_auto_reverse
+	_auto_reverse_check_button.toggled.connect(_on_auto_reverse_check_button_toggled)
 
 	# 内容エディタハイライト
 	var highlighter: CodeHighlighter = CodeHighlighter.new()
@@ -55,6 +67,7 @@ func _ready() -> void:
 	highlighter.add_keyword_color("else", Color.DODGER_BLUE)
 	highlighter.add_keyword_color("endif", Color.DODGER_BLUE)
 	highlighter.add_keyword_color("loop", Color.DODGER_BLUE)
+	highlighter.add_keyword_color("for", Color.DODGER_BLUE)
 	highlighter.add_keyword_color("from", Color.DODGER_BLUE)
 	highlighter.add_keyword_color("times", Color.DODGER_BLUE)
 	highlighter.add_keyword_color("endloop", Color.DODGER_BLUE)
@@ -74,10 +87,10 @@ func _ready() -> void:
 	highlighter.add_keyword_color("defeated", Color.DARK_SALMON)
 	highlighter.add_keyword_color("endcombat", Color.DARK_SALMON)
 
-	highlighter.add_keyword_color("exclude", Color.DIM_GRAY)
-	highlighter.add_keyword_color("endex", Color.DIM_GRAY)
+	highlighter.add_keyword_color("exclude", Color.WEB_GRAY)
+	highlighter.add_keyword_color("endex", Color.WEB_GRAY)
 
-	highlighter.add_color_region("//", "", Color.DIM_GRAY, true)
+	highlighter.add_color_region("//", "", Color.WEB_GRAY, true)
 	highlighter.add_color_region("[[", "]]", Color.AQUAMARINE, false)
 	highlighter.add_color_region("<<", ">>", Color.DARK_KHAKI, false)
 	highlighter.add_color_region("\"", "\"", Color(0.9, 0.8, 0.7), false)
@@ -90,6 +103,15 @@ func _ready() -> void:
 	highlighter_file.function_color = Color.WHITE
 	highlighter_file.add_color_region("{{", "}}", Color.BURLYWOOD, false)
 	_ibento_file_edit.syntax_highlighter = highlighter_file
+
+
+func _process(delta: float) -> void:
+	_content_edit_time = clamp(_content_edit_time - delta, 0.0, 99.0)
+	if _does_auto_reverse == true and _is_content_edited == true:
+		if _content_edit_time <= 0.0:
+			_is_content_edited = false
+			_content_edit_time = 1.0
+			_show_ibento_file_text()
 
 
 func _on_filepath_line_edit_text_changed(_text: String) -> void:
@@ -166,12 +188,18 @@ func _on_load_button_pressed() -> void:
 	for i in range(0, _ibento.shiitos.size()):
 		_shiito_list.add_item(_ibento.shiitos[i].shiito_name)
 
-	var shiito_idx: int = 0
-	_show_paneru_text(shiito_idx)
+	_edit_shiito_idx = 0
+	_show_paneru_text()
 
 
 func _on_shiito_list_selected(index: int) -> void:
-	_show_paneru_text(index)
+	_edit_shiito_idx = index
+	_show_paneru_text()
+
+
+func _on_content_edit_lines_edited_from(_from_line: int, _to_line: int) -> void:
+	_is_content_edited = true
+
 
 
 func _update_load_save_buttons() -> void:
@@ -197,14 +225,14 @@ func _update_load_save_buttons() -> void:
 		_save_button.text = ""
 
 
-func _show_paneru_text(shiito_idx: int) -> void:
+func _show_paneru_text() -> void:
 	if _ibento == null:
 		return
-	if shiito_idx < 0 or shiito_idx > _ibento.shiitos.size() - 1:
+	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
 		return
 
 	var dst_text: Array[String] = []
-	TIPTWriter.panerus_to_tip_text(dst_text, _ibento.shiitos[shiito_idx].panerus)
+	TIPTWriter.panerus_to_tip_text(dst_text, _ibento.shiitos[_edit_shiito_idx].panerus)
 
 	_content_edit.text = dst_text[0]
 	_content_edit.editable = true
@@ -212,6 +240,16 @@ func _show_paneru_text(shiito_idx: int) -> void:
 
 
 func _on_reverse_button_pressed() -> void:
+
+	_show_ibento_file_text()
+
+
+func _on_auto_reverse_check_button_toggled(toggled_on: bool) -> void:
+	_does_auto_reverse = toggled_on
+
+
+
+func _show_ibento_file_text() -> void:
 
 	var text: String = ""
 	text = _content_edit.text
@@ -232,4 +270,9 @@ func _on_reverse_button_pressed() -> void:
 		line += lines[i].word0 + "\t" + lines[i].word1
 		file_text += line + "\n"
 		#file_access.store_line(lines[i].word0 + "\t" + lines[i].word1)
+		
+	var caret_line: int = _ibento_file_edit.get_caret_line()
+	var scroll_vertical: float = _ibento_file_edit.scroll_vertical
 	_ibento_file_edit.text = file_text
+	_ibento_file_edit.set_caret_line(caret_line, true)
+	_ibento_file_edit.scroll_vertical = scroll_vertical

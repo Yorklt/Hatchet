@@ -146,7 +146,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 						joken.joken_type == Joken.Type.COND_TYPE_ARRAY_SW
 						):
 					text += "["
-					if joken.pointa > 0:
+					if joken.pointa >= 0:
 						text += "%d" % joken.pointa
 					else:
 						if joken.rokaru_ref == true:
@@ -157,7 +157,20 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 					text += "]"
 
 				text += " "
-				text += "=="
+				if joken.operator == 0:
+					text += "=="
+				elif joken.operator == 1:
+					text += "!="
+				elif joken.operator == 2:
+					text += ">="
+				elif joken.operator == 3:
+					text += "<="
+				elif joken.operator == 4:
+					text += ">"
+				elif joken.operator == 5:
+					text += "<"
+				else:
+					text += "ERROR"
 				text += " "
 
 				if (

@@ -83,8 +83,20 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 	# TIPが増えるたびにここに付け足す
 	if word0 == "//":
 		return Komando.Type.COMMENT
-	if word1 == "=" or word1 == ":=":
-		if word0 != "" and word2 != "":
+	if word0 != "" and word2 != "":
+		if word1 == "=" or word1 == ":=":
+			return Komando.Type.HLVARIABLE
+		if word1 == "+=" or word1 == ":+=":
+			return Komando.Type.HLVARIABLE
+		if word1 == "-=" or word1 == ":-=":
+			return Komando.Type.HLVARIABLE
+		if word1 == "*=" or word1 == ":*=":
+			return Komando.Type.HLVARIABLE
+		if word1 == "/=" or word1 == ":/=":
+			return Komando.Type.HLVARIABLE
+		if word1 == "mod=" or word1 == ":mod=":
+			return Komando.Type.HLVARIABLE
+		if word1 == "floor=" or word1 == ":floor=":
 			return Komando.Type.HLVARIABLE
 	if word0 == "if":
 		return Komando.Type.IFVARIABLE

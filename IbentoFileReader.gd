@@ -198,7 +198,21 @@ static func parse_paneru(dst_paneru: Paneru, lines: Array[IbentoFileLine], idx0:
 								# エラー
 								pass
 						elif sub_sub_w0 == "比較演算子":
-							joken.operator = -1
+							if sub_sub_w1 == "EQUAL":
+								joken.operator = 0
+							elif sub_sub_w1 == "NOT_EQUAL":
+								joken.operator = 1
+							elif sub_sub_w1 == "EQUAL_GREATER":
+								joken.operator = 2
+							elif sub_sub_w1 == "EQUAL_LOWER":
+								joken.operator = 3
+							elif sub_sub_w1 == "GREATER":
+								joken.operator = 4
+							elif sub_sub_w1 == "LOWER":
+								joken.operator = 5
+							else:
+								# エラー
+								joken.operator = -1
 						elif sub_sub_w0 == "インデックス":
 							joken.index = sub_sub_w1.to_int()
 						elif sub_sub_w0 == "オプション":

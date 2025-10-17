@@ -138,7 +138,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		word = edit_line.try_get_next_word()
 		var vd: ValDesign = ValDesign.try_parse_edit_text(word)
 		if vd == null:
-			error_text += "左辺が値の指定（直地か変数）ではない。: " + word
+			error_text += "右辺が値の指定（直地か変数）ではない。: " + word
 			return -1
 		design_r = vd
 
