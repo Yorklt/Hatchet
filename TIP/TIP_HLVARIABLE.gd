@@ -121,7 +121,7 @@ func reverse_into_paneru_params(
 		if chokuchi_r.c_type == Chokuchi.Type.STRING:
 			PaneruParam.add_str_to_params(params, chokuchi_r.v_str)
 
-	elif rhs_type == 3:
+	elif rhs_type == 2:
 		PaneruParam.add_hensu_to_params(params, hensu_r)
 
 	# 代入演算子

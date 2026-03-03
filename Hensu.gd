@@ -78,7 +78,11 @@ func add_to_paneru_params(params: Array[PaneruParam]) -> void:
 	elif h_type == Hensu.Type.L:
 		var param: PaneruParam = PaneruParam.new()
 		param.param_type = PaneruParam.Type.LOCAL
-		param.v_str = h_name
+		# HensuからPaneruParamへの変換時にL:を外す
+		if h_name.left(2) == "L:":
+			param.v_str = h_name.right(-2)
+		else:
+			param.v_str = h_name
 		params.append(param)
 
 	elif h_type == Hensu.Type.A:
@@ -89,14 +93,19 @@ func add_to_paneru_params(params: Array[PaneruParam]) -> void:
 		if idx_type == Hensu.Type.I:
 			var param2: PaneruParam = PaneruParam.new()
 			param2.param_type = PaneruParam.Type.INT
+			param2.v_int = idx_int
 			params.append(param2)
 		else:
 			var param2: PaneruParam = PaneruParam.new()
 			if idx_type == Hensu.Type.N:
 				param2.param_type = PaneruParam.Type.VARIABLE
+				param2.v_str = idx_h_name
 			if idx_type == Hensu.Type.L:
-				param2.param_type = PaneruParam.Type.LOCAL			
-			param2.v_str = idx_h_name
+				param2.param_type = PaneruParam.Type.LOCAL
+				if idx_h_name.left(2) == "L:":
+					param2.v_str = idx_h_name.right(-2)
+				else:
+					param2.v_str = idx_h_name
 			params.append(param2)
 
 

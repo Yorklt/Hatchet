@@ -155,6 +155,8 @@ static func parse_paneru(dst_paneru: Paneru, lines: Array[IbentoFileLine], idx0:
 			param.v_str = word1
 			dst_paneru.params.append(param)
 		elif word0 == "ローカル変数":
+			# おそらくだけど、「変数」、「配列変数」では、N:やA:が付くが、
+			# 「ローカル変数」のときはL:が付かない。
 			var param: PaneruParam = PaneruParam.new()
 			param.param_type = PaneruParam.Type.LOCAL
 			param.v_str = word1

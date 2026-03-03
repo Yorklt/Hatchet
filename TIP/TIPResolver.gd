@@ -108,6 +108,10 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 		return Komando.Type.LOOP
 	if word0 == "endloop":
 		return Komando.Type.ENDLOOP
+	if word0 == "label":
+		return Komando.Type.LABEL
+	if word0 == "goto":
+		return Komando.Type.JUMP
 	if word0 == "msg":
 		return Komando.Type.MESSAGE
 	if word0 == "call":
