@@ -55,14 +55,6 @@ offset_right = 168.0
 offset_bottom = 192.0
 text = "読み込み"
 
-[node name="SaveButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 184.0
-offset_top = 128.0
-offset_right = 336.0
-offset_bottom = 192.0
-text = "保存"
-
 [node name="ShiitoList" type="ItemList" parent="."]
 layout_mode = 1
 offset_left = 16.0
@@ -97,52 +89,22 @@ placeholder_text = "ここに内容が表示されます。"
 [node name="RightArea" type="Control" parent="HSplitContainer"]
 layout_mode = 2
 
-[node name="VSplitContainer" type="VSplitContainer" parent="HSplitContainer/RightArea"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 1.0
-split_offset = 128
-drag_area_highlight_in_editor = true
-
-[node name="Control" type="Control" parent="HSplitContainer/RightArea/VSplitContainer"]
-layout_mode = 2
-
-[node name="HSeparator" type="HSeparator" parent="HSplitContainer/RightArea/VSplitContainer/Control"]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -16.0
-offset_right = -8.0
-
-[node name="RightBottomArea" type="Control" parent="HSplitContainer/RightArea/VSplitContainer"]
-layout_mode = 2
-
-[node name="IbentoFileText" type="TextEdit" parent="HSplitContainer/RightArea/VSplitContainer/RightBottomArea"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 64.0
-
-[node name="ReverseButton" type="Button" parent="HSplitContainer/RightArea/VSplitContainer/RightBottomArea"]
+[node name="ReverseButton" type="Button" parent="HSplitContainer/RightArea"]
 layout_mode = 1
 anchors_preset = -1
 offset_right = 84.0
 offset_bottom = 32.0
 text = "変換"
 
-[node name="AutoReverseCheckButton" type="CheckButton" parent="HSplitContainer/RightArea/VSplitContainer/RightBottomArea"]
-layout_mode = 0
+[node name="AutoReverseCheckButton" type="CheckButton" parent="HSplitContainer/RightArea"]
+layout_mode = 1
+anchors_preset = -1
 offset_left = 100.0
-offset_top = 8.0
+offset_top = 9.0
 offset_right = 132.0
 offset_bottom = 32.0
 
-[node name="AutoReverseLabel" type="Label" parent="HSplitContainer/RightArea/VSplitContainer/RightBottomArea"]
+[node name="AutoReverseLabel" type="Label" parent="HSplitContainer/RightArea"]
 layout_mode = 1
 anchors_preset = -1
 offset_left = 148.0
@@ -150,3 +112,87 @@ offset_top = 8.0
 offset_right = 212.0
 offset_bottom = 32.0
 text = "自動"
+
+[node name="ErrorCount" type="Label" parent="HSplitContainer/RightArea"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 192.0
+offset_top = 8.0
+offset_right = 512.0
+offset_bottom = 32.0
+
+[node name="SuffixCheckButton" type="CheckButton" parent="HSplitContainer/RightArea"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 444.0
+offset_top = 64.0
+offset_right = 476.0
+offset_bottom = 88.0
+
+[node name="AutoReverseLabel2" type="Label" parent="HSplitContainer/RightArea"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 484.0
+offset_top = 64.0
+offset_right = 585.0
+offset_bottom = 88.0
+text = "接尾辞(_mod)"
+
+[node name="SaveButton" type="Button" parent="HSplitContainer/RightArea"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -128.0
+offset_top = 64.0
+offset_bottom = 96.0
+grow_horizontal = 0
+text = "保存"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="HSplitContainer/RightArea"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 128.0
+split_offset = 512
+drag_area_highlight_in_editor = true
+
+[node name="RightBottomLeftArea" type="Control" parent="HSplitContainer/RightArea/HSplitContainer"]
+layout_mode = 2
+
+[node name="AutoReverseLabel" type="Label" parent="HSplitContainer/RightArea/HSplitContainer/RightBottomLeftArea"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 76.0
+offset_bottom = 32.0
+text = "変換結果"
+
+[node name="IbentoFileText" type="TextEdit" parent="HSplitContainer/RightArea/HSplitContainer/RightBottomLeftArea"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 32.0
+
+[node name="RightBottomRightArea" type="Control" parent="HSplitContainer/RightArea/HSplitContainer"]
+layout_mode = 2
+
+[node name="AutoReverseLabel" type="Label" parent="HSplitContainer/RightArea/HSplitContainer/RightBottomRightArea"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = 12.0
+offset_top = 8.0
+offset_right = 76.0
+offset_bottom = 32.0
+text = "現在のファイル内データ"
+
+[node name="OriginalText" type="TextEdit" parent="HSplitContainer/RightArea/HSplitContainer/RightBottomRightArea"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 32.0
+editable = false

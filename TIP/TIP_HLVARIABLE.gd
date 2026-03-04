@@ -30,10 +30,14 @@ func transcript(
 	# わけがわからないのだけど、右辺地が整数の場合、
 	# 右辺タイプ=整数(0)が省略されることがある。
 	# 残りのパラメータの数で判断する。
+	# 追記:
+	# と、思っていたのだけど、その理屈だと「前フレームからの経過時間」(50)のときなどに、
+	# 区別が付かない。省略形を見かけなくなったので、省略形はひとまず無しにする。わけがわからない。
 	is_short_form = false
-	if params[p_idx].param_type == PaneruParam.Type.INT:
-		if params.size() - 1 == p_idx + 1:
-			is_short_form = true
+	if false: # 仕様がわからなくなったので、以下の判定は無効
+		if params[p_idx].param_type == PaneruParam.Type.INT:
+			if params.size() - 1 == p_idx + 1:
+				is_short_form = true
 
 	# オペランドの決定
 	op_type = -1
@@ -83,6 +87,12 @@ func transcript(
 		elif rhs_type == 12:
 			target_int_0 = params[p_idx].v_int
 			p_idx += 1
+
+		elif rhs_type == 50:
+			pass
+
+		elif rhs_type == -1:
+			pass
 
 		# その他
 		else:
@@ -182,6 +192,12 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		text += "<<操作キー>>"
 		text += " "
 		text += "%d" % target_int_0
+	elif rhs_type == 17:
+		text += "<<プレX>>"
+	elif rhs_type == 18:
+		text += "<<プレZ>>"
+	elif rhs_type == 39:
+		text += "<<マップID>>"
 	else:
 		text += "<<その他>>"
 		text += " "
@@ -207,6 +223,10 @@ static func _edit_word_to_op_type(word: String) -> int:
 		return 3
 	if word == "/=" or word == "/:=":
 		return 4
+	if word == "mod=" or word == "mod:=":
+		return 6
+	if word == "floor=" or word == "floor:=":
+		return 7
 	return -1
 
 
@@ -217,6 +237,12 @@ static func _edit_word_to_rhs_type(word: String) -> int:
 		return 5
 	if word == "<<操作キー>>":
 		return 12
+	if word == "<<プレX>>":
+		return 17
+	if word == "<<プレZ>>":
+		return 18
+	if word == "<<マップID>>":
+		return 39
 	if word == "<<その他>>":
 		return -2 # TBD
 	return -1

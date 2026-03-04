@@ -15,15 +15,29 @@ static func write(
 	var file_access: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 
 	var lines: Array[IbentoFileLine] = []
+
+	if true:
+		var line: IbentoFileLine = null
+		line = IbentoFileLine.new()
+		line.indent = 0
+		line.word0 = "Guid"
+		line.word1 = ibento.ibento_guid.to_text()
+		lines.append(line)
+
+	if true:
+		var line: IbentoFileLine = null
+		line = IbentoFileLine.new()
+		line.indent = 0
+		line.word0 = "イベント名"
+		line.word1 = ibento.ibento_name
+		lines.append(line)
+
 	for i in range(0, ibento.shiitos.size()):
 		var shiito: IbentoShiito = ibento.shiitos[i]
 		IbentoFileWriter.shiito_to_file_lines(lines, shiito)
 
 	for i in range(0, lines.size()):
-		var line: String = ""
-		for k in range(0, lines[i].indent):
-			line += "\t"
-		line += lines[i].word0 + "\t" + lines[i].word1
+		var line: String = lines[i].to_text()
 		file_access.store_line(line)
 
 	file_access.close()
@@ -37,14 +51,34 @@ static func shiito_to_file_lines(lines: Array[IbentoFileLine], shiito: IbentoShi
 
 	if true:
 		line = IbentoFileLine.new()
+		line.indent = 0
 		line.word0 = "シート"
-		line.word1 = ""
+		line.word1 = shiito.shiito_name
+		lines.append(line)
+
+	for i in range(0, shiito.shiito_props.size()):
+		var key: String = shiito.shiito_props.keys()[i]
+		var val: String = shiito.shiito_props.values()[i]
+		line = IbentoFileLine.new()
+		line.indent = 1
+		line.word0 = key
+		line.word1 = val
 		lines.append(line)
 
 	if true:
 		line = IbentoFileLine.new()
+		line.indent = 1
 		line.word0 = "スクリプト"
 		line.word1 = ""
+		lines.append(line)
+
+	for i in range(0, shiito.panerus_props.size()):
+		var key: String = shiito.panerus_props.keys()[i]
+		var val: String = shiito.panerus_props.values()[i]
+		line = IbentoFileLine.new()
+		line.indent = 2
+		line.word0 = key
+		line.word1 = val
 		lines.append(line)
 
 	for i in range(0, shiito.panerus.size()):
@@ -53,12 +87,14 @@ static func shiito_to_file_lines(lines: Array[IbentoFileLine], shiito: IbentoShi
 
 	if true:
 		line = IbentoFileLine.new()
+		line.indent = 1
 		line.word0 = "スクリプト終了"
 		line.word1 = ""
 		lines.append(line)
 
 	if true:
 		line = IbentoFileLine.new()
+		line.indent = 0
 		line.word0 = "シート終了"
 		line.word1 = ""
 		lines.append(line)
@@ -90,6 +126,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 		word0 = "コマンド"
 		word1 = Komando.Type.keys()[paneru.komando_type]
 		line = IbentoFileLine.new()
+		line.indent = 2
 		line.word0 = word0
 		line.word1 = word1
 		lines.append(line)
@@ -99,6 +136,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 			word0 = "{TIPエラー}}"
 			word1 = "{{" + paneru.tip.error_text + "}}"
 			line = IbentoFileLine.new()
+			line.indent = 0
 			line.word0 = word0
 			line.word1 = word1
 			lines.append(line)
@@ -129,7 +167,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 			word1 = param.v_str
 	
 		line = IbentoFileLine.new()
-		line.indent = 1
+		line.indent = 3
 		line.word0 = word0
 		line.word1 = word1
 		lines.append(line)
@@ -138,6 +176,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 		word0 = "コマンド終了"
 		word1 = ""
 		line = IbentoFileLine.new()
+		line.indent = 2
 		line.word0 = word0
 		line.word1 = word1
 		lines.append(line)

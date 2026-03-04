@@ -56,6 +56,8 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 		var paneru: Paneru = Paneru.new()
 		dst_panerus.append(paneru)
 
+		paneru.edit_line_idx = line_idx
+
 		# コマンドを判別
 		var komando_type: Komando.Type = TIPResolver.try_solve_initial_word(word0, word1, word2)
 		if komando_type == Komando.Type.INVALID:

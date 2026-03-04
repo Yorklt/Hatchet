@@ -25,6 +25,7 @@ static func read(
 			continue
 		var words: PackedStringArray = line.split("\t", false)
 		var ibento_file_line: IbentoFileLine = IbentoFileLine.new()
+		
 		if words.size() == 1:
 			ibento_file_line.word0 = words[0]
 			ibento_file_line.word1 = "" # Word1を伴うWord0でも空欄の場合もある
@@ -35,6 +36,14 @@ static func read(
 			# エラー
 			print(words.size())
 			pass
+		if true:
+			var indent: int = 0
+			for i in range(0, line.length()):
+				if line[i] == "\t":
+					indent += 1
+				else:
+					break # 区切りのタブを拾わない
+			ibento_file_line.indent = indent
 		lines.append(ibento_file_line)
 
 	file_access.close()
@@ -45,9 +54,12 @@ static func read(
 static func parse(dst_ibento: Ibento, lines: Array[IbentoFileLine], idx0: int) -> int:
 	var idx: int = idx0
 	for i in range(0, lines.size()):
+		if idx > lines.size() - 1:
+			return 0
 		var word0: String = lines[idx].word0
 		var word1: String = lines[idx].word1
 		if word0 == "Guid":
+			dst_ibento.ibento_guid = GUID.create(word1)
 			pass
 		elif word0 == "イベント名":
 			dst_ibento.ibento_name = word1
@@ -55,9 +67,6 @@ static func parse(dst_ibento: Ibento, lines: Array[IbentoFileLine], idx0: int) -
 			var shiito: IbentoShiito = IbentoShiito.new()
 			idx = IbentoFileReader.parse_shiito(shiito, lines, idx)
 			dst_ibento.shiitos.append(shiito)
-			# ファイルの端まで行ったら終了
-			if idx >= lines.size() - 1:
-				return 0
 		else:
 			# その他
 			pass
@@ -67,30 +76,61 @@ static func parse(dst_ibento: Ibento, lines: Array[IbentoFileLine], idx0: int) -
 
 static func parse_shiito(dst_shiito: IbentoShiito, lines: Array[IbentoFileLine], idx0: int) -> int:
 	var idx: int = idx0
+
+	# 記録
+	var does_add: bool = false
+	var does_finish: bool = false
 	for i in range(0, lines.size()):
+		if idx > lines.size() - 1:
+			break
+		var word0: String = lines[idx].word0
+		if word0 == "シート":
+			does_add = true
+		elif word0 == "シート終了":
+			does_finish = true
+
+		if does_add == true:
+			dst_shiito.raw_lines.append(lines[idx])
+		if does_finish == true:
+			break
+
+		idx += 1
+
+	idx = idx0
+
+	for i in range(0, lines.size()):
+		if idx > lines.size() - 1:
+			break
 		var word0: String = lines[idx].word0
 		var word1: String = lines[idx].word1
 		if word0 == "シート":
 			dst_shiito.shiito_name = word1
 		elif word0 == "スクリプト":
-			idx = IbentoFileReader.parse_panerus(dst_shiito.panerus, lines, idx)
+			idx = IbentoFileReader.parse_panerus(dst_shiito.panerus_props, dst_shiito.panerus, lines, idx)
 		elif word0 == "シート終了":
 			return idx
 		else:
 			# その他
+			# 辞書に突っ込む
+			dst_shiito.shiito_props.set(word0, word1)
 			pass
 		idx += 1
 	return -1
 
 
-static func parse_panerus(dst_panerus: Array[Paneru], lines: Array[IbentoFileLine], idx0: int) -> int:
+static func parse_panerus(dst_panerus_props: Dictionary[String, String], dst_panerus: Array[Paneru], lines: Array[IbentoFileLine], idx0: int) -> int:
 	var idx: int = idx0
 	for i in range(0, lines.size()):
 		var word0: String = lines[idx].word0
+		var word1: String = lines[idx].word1
 		if word0 == "スクリプト":
 			pass
 		elif word0 == "開始条件":
-			pass
+			dst_panerus_props.set(word0, word1)
+		elif word0 == "高さ無視":
+			dst_panerus_props.set(word0, word1)
+		elif word0 == "判定拡張":
+			dst_panerus_props.set(word0, word1)
 		elif word0 == "コマンド":
 			var paneru: Paneru = Paneru.new()
 			idx = IbentoFileReader.parse_paneru(paneru, lines, idx)

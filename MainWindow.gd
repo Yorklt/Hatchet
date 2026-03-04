@@ -10,6 +10,8 @@ var _content_edit: TextEdit = null
 var _reverse_button: Button = null
 var _auto_reverse_check_button: CheckButton = null
 var _ibento_file_edit: TextEdit = null
+var _raw_text_edit: TextEdit = null
+var _error_count_label: Label = null
 var _file_dialog: FileDialog = null
 
 var _ibento: Ibento = null
@@ -26,12 +28,14 @@ func _ready() -> void:
 	_filepath_line_edit = $FilepathEdit as LineEdit
 	_file_dialog_button = $FileDialogButton as Button
 	_load_button = $LoadButton as Button
-	_save_button = $SaveButton as Button
+	_save_button = $HSplitContainer/RightArea/SaveButton as Button
 	_shiito_list = $ShiitoList as ItemList
 	_content_edit = $HSplitContainer/ContentEdit as TextEdit
-	_reverse_button = $HSplitContainer/RightArea/VSplitContainer/RightBottomArea/ReverseButton as Button
-	_auto_reverse_check_button = $HSplitContainer/RightArea/VSplitContainer/RightBottomArea/AutoReverseCheckButton as CheckButton
-	_ibento_file_edit = $HSplitContainer/RightArea/VSplitContainer/RightBottomArea/IbentoFileText as TextEdit
+	_reverse_button = $HSplitContainer/RightArea/ReverseButton as Button
+	_auto_reverse_check_button = $HSplitContainer/RightArea/AutoReverseCheckButton as CheckButton
+	_ibento_file_edit = $HSplitContainer/RightArea/HSplitContainer/RightBottomLeftArea/IbentoFileText as TextEdit
+	_raw_text_edit = $HSplitContainer/RightArea/HSplitContainer/RightBottomRightArea/OriginalText as TextEdit
+	_error_count_label = $HSplitContainer/RightArea/ErrorCount as Label
 
 	# ファイルパスの入力欄
 	_filepath_line_edit.text_changed.connect(_on_filepath_line_edit_text_changed)
@@ -42,6 +46,10 @@ func _ready() -> void:
 	# ロードボタン
 	_load_button.disabled = true
 	_load_button.pressed.connect(_on_load_button_pressed)
+
+	# セーブボタン
+	_save_button.disabled = true
+	_save_button.pressed.connect(_on_save_button_pressed)
 
 	# シートリスト
 	_shiito_list.item_selected.connect(_on_shiito_list_selected)
@@ -57,6 +65,9 @@ func _ready() -> void:
 	_does_auto_reverse = true
 	_auto_reverse_check_button.button_pressed = _does_auto_reverse
 	_auto_reverse_check_button.toggled.connect(_on_auto_reverse_check_button_toggled)
+	
+	# 変換後のテキスト
+	_ibento_file_edit.caret_changed.connect(_on_ibento_file_edit_caret_changed)
 
 	# 内容エディタハイライト
 	var highlighter: CodeHighlighter = CodeHighlighter.new()
@@ -190,16 +201,45 @@ func _on_load_button_pressed() -> void:
 
 	_edit_shiito_idx = 0
 	_show_paneru_text()
+	_show_raw_text()
+
+
+func _on_save_button_pressed() -> void:
+
+	if _ibento == null:
+		return
+
+	var path: String = _filepath_line_edit.text
+	var extension: String = path.get_extension()
+	path = path.left(0 - extension.length() - 1) # 拡張子とピリオドを取り除く
+	path += "_mod"
+	path += "." + extension
+	IbentoFileWriter.write(_ibento, path)
 
 
 func _on_shiito_list_selected(index: int) -> void:
 	_edit_shiito_idx = index
 	_show_paneru_text()
+	_show_raw_text()
 
 
 func _on_content_edit_lines_edited_from(_from_line: int, _to_line: int) -> void:
 	_is_content_edited = true
 
+
+func _on_ibento_file_edit_caret_changed() -> void:
+
+	if _ibento == null:
+		return
+	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
+		return
+#
+	#var line_at: int = _ibento_file_edit.get_caret_line(0)
+#
+	#var paneru_idx: int = 0
+	#for i in range(0, _ibento.shiitos[_edit_shiito_idx].panerus.size()):
+		#if _ibento.shiitos[_edit_shiito_idx].panerus[i].edit_line_idx == line_at:
+			#paneru_idx = 0
 
 
 func _update_load_save_buttons() -> void:
@@ -212,12 +252,12 @@ func _update_load_save_buttons() -> void:
 			_load_button.disabled = false
 			_load_button.text = "読み込み"
 			_save_button.disabled = false
-			_save_button.text = "上書き（未実装）"
+			_save_button.text = "上書き"
 		else:
 			_load_button.disabled = true
 			_load_button.text = "存在しません"
 			_save_button.disabled = false
-			_save_button.text = "新規保存（未実装）"
+			_save_button.text = "新規保存"
 	else:
 		_load_button.disabled = true
 		_load_button.text = ""
@@ -251,28 +291,62 @@ func _on_auto_reverse_check_button_toggled(toggled_on: bool) -> void:
 
 func _show_ibento_file_text() -> void:
 
-	var text: String = ""
-	text = _content_edit.text
-	
-	var panerus: Array[Paneru] = []
-	TIPTReader.tip_text_to_panerus(panerus, text)
-
-	var lines: Array[IbentoFileLine] = []
-	for i in range(0, panerus.size()):
-		var paneru: Paneru = panerus[i]
-		IbentoFileWriter.paneru_to_file_lines(lines, paneru)
+	if _ibento == null:
+		return
+	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
+		return
 
 	var file_text: String = ""
-	for i in range(0, lines.size()):
-		var line: String = ""
-		for k in range(0, lines[i].indent):
-			line += "\t"
-		line += lines[i].word0 + "\t" + lines[i].word1
-		file_text += line + "\n"
-		#file_access.store_line(lines[i].word0 + "\t" + lines[i].word1)
+
+	if true:
+		var text: String = ""
+		text = _content_edit.text
+		
+		var panerus: Array[Paneru] = []
+		TIPTReader.tip_text_to_panerus(panerus, text)
+		_ibento.shiitos[_edit_shiito_idx].panerus = panerus
+		
+		var error_count: int = 0
+		for i in range(0, panerus.size()):
+			if panerus[i].tipt_error != "":
+				error_count += 1
+		if error_count > 0:
+			_error_count_label.text = "エラーあり（" + str(error_count) + "個）"
+			_error_count_label.add_theme_color_override("font_color", Color.BURLYWOOD)
+		else:
+			_error_count_label.text = ""
+			_error_count_label.add_theme_color_override("font_color", Color.WHITE)
+
+		var lines: Array[IbentoFileLine] = []
+		IbentoFileWriter.shiito_to_file_lines(lines, _ibento.shiitos[_edit_shiito_idx])
+
+		for i in range(0, lines.size()):
+			file_text += lines[i].to_text() + "\n"
+			#file_access.store_line(lines[i].word0 + "\t" + lines[i].word1)
 		
 	var caret_line: int = _ibento_file_edit.get_caret_line()
 	var scroll_vertical: float = _ibento_file_edit.scroll_vertical
 	_ibento_file_edit.text = file_text
 	_ibento_file_edit.set_caret_line(caret_line, true)
 	_ibento_file_edit.scroll_vertical = scroll_vertical
+
+
+
+func _show_raw_text() -> void:
+
+	if _ibento == null:
+		return
+	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
+		return
+
+	var lines: Array[IbentoFileLine] = _ibento.shiitos[_edit_shiito_idx].raw_lines
+
+	var file_text: String = ""
+	for i in range(0, lines.size()):
+		file_text += lines[i].to_text() + "\n"
+
+	var caret_line: int = _raw_text_edit.get_caret_line()
+	var scroll_vertical: float = _raw_text_edit.scroll_vertical
+	_raw_text_edit.text = file_text
+	_raw_text_edit.set_caret_line(caret_line, true)
+	_raw_text_edit.scroll_vertical = scroll_vertical
