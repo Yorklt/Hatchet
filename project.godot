@@ -23,5 +23,5 @@ gdscript/warnings/unsafe_call_argument=1
 
 [display]
 
-window/size/viewport_width=1876
-window/size/viewport_height=976
+window/size/viewport_width=1856
+window/size/viewport_height=960

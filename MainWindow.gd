@@ -9,12 +9,12 @@ var _shiito_list: ItemList = null
 var _content_edit: TextEdit = null
 var _reverse_button: Button = null
 var _auto_reverse_check_button: CheckButton = null
-var _ibento_file_edit: TextEdit = null
+var _reversed_file_edit: TextEdit = null
 var _raw_text_edit: TextEdit = null
 var _error_count_label: Label = null
 var _file_dialog: FileDialog = null
 
-var _ibento: Ibento = null
+var _hatchet: Hatchet = null
 
 var _edit_shiito_idx: int = -1
 var _does_auto_reverse: bool = true
@@ -28,14 +28,14 @@ func _ready() -> void:
 	_filepath_line_edit = $FilepathEdit as LineEdit
 	_file_dialog_button = $FileDialogButton as Button
 	_load_button = $LoadButton as Button
-	_save_button = $HSplitContainer/RightArea/SaveButton as Button
+	_save_button = $SaveButton as Button
 	_shiito_list = $ShiitoList as ItemList
 	_content_edit = $HSplitContainer/ContentEdit as TextEdit
-	_reverse_button = $HSplitContainer/RightArea/ReverseButton as Button
-	_auto_reverse_check_button = $HSplitContainer/RightArea/AutoReverseCheckButton as CheckButton
-	_ibento_file_edit = $HSplitContainer/RightArea/HSplitContainer/RightBottomLeftArea/IbentoFileText as TextEdit
-	_raw_text_edit = $HSplitContainer/RightArea/HSplitContainer/RightBottomRightArea/OriginalText as TextEdit
-	_error_count_label = $HSplitContainer/RightArea/ErrorCount as Label
+	_reverse_button = $ReverseButton as Button
+	_auto_reverse_check_button = $AutoReverseCheckButton as CheckButton
+	_reversed_file_edit = $HSplitContainer/TabContainer/Reversed/IbentoFileText as TextEdit
+	_raw_text_edit = $HSplitContainer/TabContainer/Raw/OriginalText as TextEdit
+	_error_count_label = $ErrorCount as Label
 
 	# ファイルパスの入力欄
 	_filepath_line_edit.text_changed.connect(_on_filepath_line_edit_text_changed)
@@ -66,8 +66,11 @@ func _ready() -> void:
 	_auto_reverse_check_button.button_pressed = _does_auto_reverse
 	_auto_reverse_check_button.toggled.connect(_on_auto_reverse_check_button_toggled)
 	
-	# 変換後のテキスト
-	_ibento_file_edit.caret_changed.connect(_on_ibento_file_edit_caret_changed)
+	# 逆変換後のテキスト
+	_reversed_file_edit.caret_changed.connect(_on_ibento_file_edit_caret_changed)
+	
+	# 生データテキスト
+	_reversed_file_edit.editable = false
 
 	# 内容エディタハイライト
 	var highlighter: CodeHighlighter = CodeHighlighter.new()
@@ -108,12 +111,16 @@ func _ready() -> void:
 
 	_content_edit.syntax_highlighter = highlighter
 
+	# 逆変換後テキストのハイライト
+	# エラーだけ目立たせる
 	var highlighter_file: CodeHighlighter = CodeHighlighter.new()
 	highlighter_file.number_color = Color.WHITE
 	highlighter_file.symbol_color = Color.WHITE
 	highlighter_file.function_color = Color.WHITE
 	highlighter_file.add_color_region("{{", "}}", Color.BURLYWOOD, false)
-	_ibento_file_edit.syntax_highlighter = highlighter_file
+	_reversed_file_edit.syntax_highlighter = highlighter_file
+
+	_hatchet = Hatchet.new()
 
 
 func _process(delta: float) -> void:
@@ -122,12 +129,14 @@ func _process(delta: float) -> void:
 		if _content_edit_time <= 0.0:
 			_is_content_edited = false
 			_content_edit_time = 1.0
-			_show_ibento_file_text()
+			_reverse_tip_and_show_ibento_file_text()
 
 
 func _on_filepath_line_edit_text_changed(_text: String) -> void:
-	_update_load_save_buttons()
+	_update_load_button()
 
+
+# ファイルダイアログ
 
 func _on_file_dialog_button_pressed() -> void:
 
@@ -135,7 +144,7 @@ func _on_file_dialog_button_pressed() -> void:
 
 		var file_dialog: FileDialog = FileDialog.new()
 		_file_dialog = file_dialog
-		
+
 		file_dialog.access = FileDialog.ACCESS_FILESYSTEM
 		file_dialog.title = "エクスポートしたイベントファイルを選んでください"
 		file_dialog.mode_overrides_title = false
@@ -163,6 +172,8 @@ func _on_file_dialog_button_pressed() -> void:
 
 		file_dialog.visible = true
 
+		file_dialog.current_dir = "C:/"
+
 		get_tree().root.add_child(file_dialog)
 
 
@@ -172,7 +183,9 @@ func _on_file_dialog_file_selected(path: String) -> void:
 	_file_dialog = null
 
 	_filepath_line_edit.text = path
-	_update_load_save_buttons()
+	_update_load_button()
+	
+	_load_ibento()
 
 
 func _on_file_dialog_canceled() -> void:
@@ -181,58 +194,36 @@ func _on_file_dialog_canceled() -> void:
 	_file_dialog = null
 
 
-
 func _on_load_button_pressed() -> void:
-	
-	var path: String = _filepath_line_edit.text
 
-	if FileAccess.file_exists(path) == false:
-		return
-
-	_ibento = Ibento.new()
-	IbentoFileReader.read(_ibento, path)
-
-	for shiito_idx in range(0, _ibento.shiitos.size()):
-		TIPResolver.transcript_panels(_ibento.shiitos[shiito_idx].panerus)
-
-	_shiito_list.clear()
-	for i in range(0, _ibento.shiitos.size()):
-		_shiito_list.add_item(_ibento.shiitos[i].shiito_name)
-
-	_edit_shiito_idx = 0
-	_show_paneru_text()
-	_show_raw_text()
+	_load_ibento()
 
 
 func _on_save_button_pressed() -> void:
 
-	if _ibento == null:
-		return
-
-	var path: String = _filepath_line_edit.text
-	var extension: String = path.get_extension()
-	path = path.left(0 - extension.length() - 1) # 拡張子とピリオドを取り除く
-	path += "_mod"
-	path += "." + extension
-	IbentoFileWriter.write(_ibento, path)
+	_save_ibento()
 
 
 func _on_shiito_list_selected(index: int) -> void:
 	_edit_shiito_idx = index
-	_show_paneru_text()
+	var edit_text: String = _hatchet.get_edit_text(_edit_shiito_idx)
+	_content_edit.text = edit_text
+	_content_edit.editable = true
 	_show_raw_text()
 
 
 func _on_content_edit_lines_edited_from(_from_line: int, _to_line: int) -> void:
+	# 自動逆変換モードでも、毎回逆変換するのではなく、
+	# フラグを立てておいて、定期的に逆変換する。
 	_is_content_edited = true
 
 
 func _on_ibento_file_edit_caret_changed() -> void:
-
-	if _ibento == null:
-		return
-	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
-		return
+	pass
+	#if _ibento == null:
+		#return
+	#if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
+		#return
 #
 	#var line_at: int = _ibento_file_edit.get_caret_line(0)
 #
@@ -242,7 +233,7 @@ func _on_ibento_file_edit_caret_changed() -> void:
 			#paneru_idx = 0
 
 
-func _update_load_save_buttons() -> void:
+func _update_load_button() -> void:
 
 	var path: String = _filepath_line_edit.text
 
@@ -251,37 +242,42 @@ func _update_load_save_buttons() -> void:
 		if FileAccess.file_exists(path) == true:
 			_load_button.disabled = false
 			_load_button.text = "読み込み"
-			_save_button.disabled = false
-			_save_button.text = "上書き"
 		else:
 			_load_button.disabled = true
 			_load_button.text = "存在しません"
-			_save_button.disabled = false
-			_save_button.text = "新規保存"
 	else:
 		_load_button.disabled = true
 		_load_button.text = ""
+
+
+func _update_save_button() -> void:
+
+	var can_save: bool = _hatchet.can_save_ibento()
+	if can_save == true: # セーブできるならボタンを押せない(disable)ことがない(false)
+		_save_button.disabled = false
+	if can_save == false: # セーブできないならボタンを押せない(disable)でよろしい(true)
 		_save_button.disabled = true
-		_save_button.text = ""
 
+	var path: String = _filepath_line_edit.text
 
-func _show_paneru_text() -> void:
-	if _ibento == null:
-		return
-	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
-		return
+	# 接尾辞を付ける
+	var extension: String = path.get_extension()
+	path = path.left(0 - extension.length() - 1) # 拡張子とピリオドを取り除く
+	path += "_mod"
+	path += "." + extension
 
-	var dst_text: Array[String] = []
-	TIPTWriter.panerus_to_tip_text(dst_text, _ibento.shiitos[_edit_shiito_idx].panerus)
-
-	_content_edit.text = dst_text[0]
-	_content_edit.editable = true
-	#_content_edit.scroll_vertical = float(_content_edit.get_last_unhidden_line())
+	# ファイルの有無で表示を変える
+	if FileAccess.file_exists(path) == true:
+		_save_button.disabled = false
+		_save_button.text = "上書き"
+	else:
+		_save_button.disabled = false
+		_save_button.text = "新規保存"
 
 
 func _on_reverse_button_pressed() -> void:
 
-	_show_ibento_file_text()
+	_reverse_tip_and_show_ibento_file_text()
 
 
 func _on_auto_reverse_check_button_toggled(toggled_on: bool) -> void:
@@ -289,64 +285,69 @@ func _on_auto_reverse_check_button_toggled(toggled_on: bool) -> void:
 
 
 
-func _show_ibento_file_text() -> void:
+func _reverse_tip_and_show_ibento_file_text() -> void:
 
-	if _ibento == null:
-		return
-	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
-		return
+	# 編集テキストをHatchetに反映
+	_hatchet.set_edit_text(_edit_shiito_idx, _content_edit.text)
 
-	var file_text: String = ""
-
-	if true:
-		var text: String = ""
-		text = _content_edit.text
-		
-		var panerus: Array[Paneru] = []
-		TIPTReader.tip_text_to_panerus(panerus, text)
-		_ibento.shiitos[_edit_shiito_idx].panerus = panerus
-		
-		var error_count: int = 0
-		for i in range(0, panerus.size()):
-			if panerus[i].tipt_error != "":
-				error_count += 1
-		if error_count > 0:
-			_error_count_label.text = "エラーあり（" + str(error_count) + "個）"
-			_error_count_label.add_theme_color_override("font_color", Color.BURLYWOOD)
-		else:
-			_error_count_label.text = ""
-			_error_count_label.add_theme_color_override("font_color", Color.WHITE)
-
-		var lines: Array[IbentoFileLine] = []
-		IbentoFileWriter.shiito_to_file_lines(lines, _ibento.shiitos[_edit_shiito_idx])
-
-		for i in range(0, lines.size()):
-			file_text += lines[i].to_text() + "\n"
-			#file_access.store_line(lines[i].word0 + "\t" + lines[i].word1)
-		
-	var caret_line: int = _ibento_file_edit.get_caret_line()
-	var scroll_vertical: float = _ibento_file_edit.scroll_vertical
-	_ibento_file_edit.text = file_text
-	_ibento_file_edit.set_caret_line(caret_line, true)
-	_ibento_file_edit.scroll_vertical = scroll_vertical
+	var error_count: int = _hatchet.reverse_tip(_edit_shiito_idx)
+	if error_count > 0:
+		# エラーがあっても続ける
+		pass
+	
+	var file_text: String = _hatchet.shiito_to_file_text(_edit_shiito_idx)
+	
+	# カーソル位置をできるだけ維持したまま更新
+	var caret_line: int = _reversed_file_edit.get_caret_line()
+	var scroll_vertical: float = _reversed_file_edit.scroll_vertical
+	_reversed_file_edit.text = file_text
+	_reversed_file_edit.set_caret_line(caret_line, true)
+	_reversed_file_edit.scroll_vertical = scroll_vertical
 
 
 
 func _show_raw_text() -> void:
 
-	if _ibento == null:
-		return
-	if _edit_shiito_idx < 0 or _edit_shiito_idx > _ibento.shiitos.size() - 1:
-		return
-
-	var lines: Array[IbentoFileLine] = _ibento.shiitos[_edit_shiito_idx].raw_lines
+	var lines: Array[IbentoFileLine] = _hatchet.get_raw_lines(_edit_shiito_idx)
 
 	var file_text: String = ""
 	for i in range(0, lines.size()):
 		file_text += lines[i].to_text() + "\n"
 
+	# カーソル位置をできるだけ維持したまま更新
 	var caret_line: int = _raw_text_edit.get_caret_line()
 	var scroll_vertical: float = _raw_text_edit.scroll_vertical
 	_raw_text_edit.text = file_text
 	_raw_text_edit.set_caret_line(caret_line, true)
 	_raw_text_edit.scroll_vertical = scroll_vertical
+
+
+func _load_ibento() -> void:
+	
+	var path: String = _filepath_line_edit.text
+
+	_hatchet.load_ibento(path)
+
+	_shiito_list.clear()
+	var names: Array[String] = _hatchet.get_shiito_names()
+	for i in range(0, names.size()):
+		_shiito_list.add_item(names[i])
+
+	_edit_shiito_idx = 0
+	var edit_text: String = _hatchet.get_edit_text(_edit_shiito_idx)
+	_content_edit.text = edit_text
+	_content_edit.editable = true
+	_show_raw_text()
+
+
+func _save_ibento() -> void:
+
+	var path: String = _filepath_line_edit.text
+
+	# 接尾辞を付ける
+	var extension: String = path.get_extension()
+	path = path.left(0 - extension.length() - 1) # 拡張子とピリオドを取り除く
+	path += "_mod"
+	path += "." + extension
+
+	_hatchet.save_ibento(path)

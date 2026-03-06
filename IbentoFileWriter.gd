@@ -109,7 +109,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 
 	if paneru.komando_type == Komando.Type.INVALID:
 		word0 = "{{コマンドエラー}}"
-		word1 = "{{" + paneru.tipt_error + "}}"
+		word1 = "{{" + paneru.reverse_error + "}}"
 		line = IbentoFileLine.new()
 		line.word0 = word0
 		line.word1 = word1

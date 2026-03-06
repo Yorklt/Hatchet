@@ -6,7 +6,7 @@ var komando_type: Komando.Type
 var params: Array[PaneruParam] = []
 var tip: TIP = null
 var edit_line_idx: int = 0
-var tipt_error: String = ""
+var reverse_error: String = ""
 
 func to_edit_lines(last_begin: Komando.Type) -> String:
 	var text: String = ""

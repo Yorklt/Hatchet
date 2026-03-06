@@ -64,7 +64,7 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 			# 未対応コマンド、または複数行にわたる未判定コマンドの後の行、またはただの判別不能
 			paneru.komando_as_str = "?"
 			paneru.komando_type = Komando.Type.INVALID
-			paneru.tipt_error = "行が解釈不能: " + edit_line.line
+			paneru.reverse_error = "行が解釈不能: " + edit_line.line
 			line_idx += 1
 			continue
 		elif komando_type == Komando.Type.KOMANDO:
@@ -94,7 +94,7 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 		var tip: TIP = TIPResolver.try_create_tip_by_komando(komando_type)
 		if tip == null:
 			# TIP未対応コマンド
-			paneru.tipt_error = "TIP未対応コマンド: " + Komando.Type.keys()[komando_type]
+			paneru.reverse_error = "TIP未対応コマンド: " + Komando.Type.keys()[komando_type]
 			line_idx += 1
 			continue
 		paneru.tip = tip
