@@ -62,7 +62,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
 	var edit_line: TIPEditLine = null
@@ -70,7 +70,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "goto":
-		error_text += "gotoを期待したがgotoではない。: " + word + " "
+		dst_error_text.append("gotoを期待したがgotoではない。: " + word)
 		return -1
 
 	# 直地か変数
@@ -85,7 +85,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			jump_type = TIP_JUMP.Type.BY_HENSU
 			label_num_hensu = hensu
 		else:
-			error_text += "gotoの後が判別不能。変数でも直地でもない。: " + word
+			dst_error_text.append("gotoの後が判別不能。変数でも直地でもない。: " + word)
 			return -1
 
 	line_idx += 1

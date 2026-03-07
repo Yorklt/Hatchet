@@ -1,7 +1,7 @@
 class_name TIP
 extends RefCounted
 
-# TIP: Transcripted Ibento Paneru
+# TIP: Translated Ibento Paneru
 
 enum BlockType
 {
@@ -14,7 +14,7 @@ enum BlockType
 
 var block_type: TIP.BlockType = TIP.BlockType.NONE
 var original_komando_name: String = ""
-var error_text: String = ""
+var error_text_trans: String = ""
 
 
 func transcript(
@@ -34,6 +34,7 @@ func reverse_into_paneru_params(
 
 
 func from_edit_lines(
+		_dst_error_text: Array[String],
 		_edit_lines: Array[TIPEditLine],
 		_line_idx: int,
 		) -> int:

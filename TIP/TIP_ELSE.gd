@@ -24,7 +24,7 @@ func to_edit_lines(last_begin: Komando.Type) -> String:
 
 	return text
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
 	var edit_line: TIPEditLine = null
@@ -32,7 +32,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "else" and word != "defeated":
-		error_text += "elseでもdefeatedでもない。: " + word + " "
+		dst_error_text.append("elseでもdefeatedでもない。: " + word)
 		return -1
 
 	line_idx += 1

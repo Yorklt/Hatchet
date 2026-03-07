@@ -16,7 +16,7 @@ func transcript(
 	if params[p_idx].param_type == PaneruParam.Type.STRING:
 		display_text = params[p_idx].v_str
 	else:
-		error_text += "P1が文字列でない"
+		error_text_trans += "P1が文字列でない"
 
 	p_idx += 1
 
@@ -26,7 +26,7 @@ func transcript(
 	elif params[p_idx].param_type == PaneruParam.Type.GUID:
 		ibento_guid = GUID.create(params[p_idx].v_str)
 	else:
-		error_text += "表示位置が不明"
+		error_text_trans += "表示位置が不明"
 
 	p_idx += 1
 
@@ -37,9 +37,9 @@ func transcript(
 		elif params[p_idx].v_int == 1:
 			has_window = false
 		else:
-			error_text += "ウィンドウの有無が解釈不能"
+			error_text_trans += "ウィンドウの有無が解釈不能"
 	else:
-		error_text += "ウィンドウの有無が不明"
+		error_text_trans += "ウィンドウの有無が不明"
 
 func reverse_into_paneru_params(
 		params: Array[PaneruParam],
@@ -103,7 +103,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	# msg <<上>>
 	# "こんにちは。"
@@ -115,7 +115,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "msg":
-		error_text += "msgを期待したがmsgではない。: " + word + " "
+		dst_error_text.append("msgを期待したがmsgではない。: " + word)
 		return -1
 	
 	for i in range(0, 99):
@@ -137,7 +137,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			has_window = false
 		else:
 			# エラー
-			error_text += "msgの後に不明なワード: " + word + " "
+			dst_error_text.append("msgの後に不明なワード: " + word)
 			pass
 
 	for i in range(0, 99):

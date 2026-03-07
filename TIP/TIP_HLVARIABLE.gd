@@ -204,8 +204,8 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 		text += "%d" % rhs_type
 		for i in range(0, rhs_params.size()):
 			text += " "
-			if rhs_params[i].error_text != "":
-				text += "{{" + rhs_params[i].error_text + "}}"
+			if rhs_params[i].parse_edit_error_text != "":
+				text += "{{" + rhs_params[i].parse_edit_error_text + "}}"
 			else:
 				text += rhs_params[i].to_edit_text()
 
@@ -248,7 +248,7 @@ static func _edit_word_to_rhs_type(word: String) -> int:
 	return -1
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
 	var edit_line: TIPEditLine = null
@@ -258,7 +258,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		word = edit_line.try_get_next_word()
 		var hensu: Hensu = Hensu.try_parse_edit_text(word)
 		if hensu == null:
-			error_text += "左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg + " "
+			dst_error_text.append("左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg)
 			return -1
 		hensu_l = hensu
 
@@ -266,7 +266,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		word = edit_line.try_get_next_word()
 		op_type = TIP_HLVARIABLE._edit_word_to_op_type(word)
 		if op_type < 0:
-			error_text += "変数の後の代入演算子が不明。: " + word + " "
+			dst_error_text.append("変数の後の代入演算子が不明。: " + word)
 			return -1
 
 	word = edit_line.try_get_next_word()
@@ -276,7 +276,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			# 未対応の右辺タイプ
 			word = edit_line.try_get_next_word()
 			if word.is_valid_int() == false:
-				error_text += "右辺タイプがその他だが、右辺のタイプ値が整数ではない。: " + word
+				dst_error_text.append("右辺タイプがその他だが、右辺のタイプ値が整数ではない。: " + word)
 				return -1
 			rhs_type = word.to_int()
 			for i in range(0, 99):
@@ -301,7 +301,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 					rhs_type = 2
 					hensu_r = hensu
 				else:
-					error_text += "右辺が判別不能。変数でも直地でもない。: " + word
+					dst_error_text.append("右辺が判別不能。変数でも直地でもない。: " + word)
 					return -1
 	else:
 		if rhs_type == 1:
@@ -310,13 +310,13 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			if word.is_valid_int() == true:
 				PaneruParam.add_int_to_params(rhs_params, word.to_int())
 			else:
-				error_text += "乱数の最小値が不明。: " + word
+				dst_error_text.append("乱数の最小値が不明。: " + word)
 				return -1
 			word = edit_line.try_get_next_word()
 			if word.is_valid_int() == true:
 				PaneruParam.add_int_to_params(rhs_params, word.to_int())
 			else:
-				error_text += "乱数の最大値が不明。: " + word
+				dst_error_text.append("乱数の最大値が不明。: " + word)
 				return -1
 		elif rhs_type == 5:
 			# アイテム数
@@ -330,7 +330,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			if word.is_valid_int() == true:
 				PaneruParam.add_int_to_params(rhs_params, word.to_int())
 			else:
-				error_text += "操作キーの取得で、対象が不明。: " + word
+				dst_error_text.append("操作キーの取得で、対象が不明。: " + word)
 				return -1
 		
 		# TBD

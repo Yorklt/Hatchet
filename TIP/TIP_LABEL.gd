@@ -30,7 +30,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
 	var edit_line: TIPEditLine = null
@@ -38,7 +38,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "label":
-		error_text += "labelを期待したがgotoではない。: " + word + " "
+		dst_error_text.append("labelを期待したがgotoではない。: " + word)
 		return -1
 
 	# 直地の整数
@@ -48,10 +48,10 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		if chokuchi.c_type == Chokuchi.Type.INT:
 			label_num = chokuchi.v_int
 		else:
-			error_text += "labelの後が判別不能。直地だが整数でない。: " + word
+			dst_error_text.append("labelの後が判別不能。直地だが整数でない。: " + word)
 			return -1
 	else:
-		error_text += "labelの後が判別不能。直地でない。: " + word
+		dst_error_text.append("labelの後が判別不能。直地でない。: " + word)
 		return -1
 
 	line_idx += 1

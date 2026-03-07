@@ -21,11 +21,20 @@ func transcript(
 	p_idx = p_idx_next[0]
 
 	# オペランド
-	var op_idx: int = params.size() - 1 # 最後がオペランドと決め打ちする
-	if params[op_idx].param_type == PaneruParam.Type.INT:
-		op_type = params[op_idx].v_int
+	var mergin_idx: int = params.size() - 1 # 最後がオペランドと決め打ちする
+	var op_idx: int = -1
+	if params[mergin_idx].param_type == PaneruParam.Type.FLOAT:
+		op_idx = params.size() - 2 # 最後から2番目がオペランドと決め打ちする
+		if params[op_idx].param_type == PaneruParam.Type.INT:
+			op_type = params[op_idx].v_int
+		else:
+			error_text_trans += "最後から2番目のPがINTではない"
 	else:
-		error_text += "最後のPがINTではない"
+		op_idx = params.size() - 1 # マージンが無ければ最後がオペランド
+		if params[op_idx].param_type == PaneruParam.Type.INT:
+			op_type = params[op_idx].v_int
+		else:
+			error_text_trans += "最後のPがINTではない"
 
 	# 右辺
 	design_r = ValDesign.parse_paneru_params(p_idx_next, params, p_idx)
@@ -107,7 +116,7 @@ static func _edit_word_to_op_type(word: String) -> int:
 
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
 	var edit_line: TIPEditLine = null
@@ -116,14 +125,14 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 	if true:
 		word = edit_line.try_get_next_word()
 		if word != "if":
-			error_text += "ifを期待したがifではない。: " + word
+			dst_error_text.append("ifを期待したがifではない。: " + word)
 			return -1
 
 	if true:
 		word = edit_line.try_get_next_word()
 		var hensu: Hensu = Hensu.try_parse_edit_text(word)
 		if hensu == null:
-			error_text += "左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg + " "
+			dst_error_text.append("左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg)
 			return -1
 		hensu_l = hensu
 
@@ -131,14 +140,14 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		word = edit_line.try_get_next_word()
 		op_type = TIP_IFVARIABLE._edit_word_to_op_type(word)
 		if op_type < 0:
-			error_text += "変数の後の代入演算子が不明。: " + word + " "
+			dst_error_text.append("変数の後の代入演算子が不明。: " + word)
 			return -1
 
 	if true:
 		word = edit_line.try_get_next_word()
 		var vd: ValDesign = ValDesign.try_parse_edit_text(word)
 		if vd == null:
-			error_text += "右辺が値の指定（直地か変数）ではない。: " + word
+			dst_error_text.append("右辺が値の指定（直地か変数）ではない。: " + word)
 			return -1
 		design_r = vd
 

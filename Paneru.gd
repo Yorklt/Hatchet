@@ -20,8 +20,11 @@ func to_edit_lines(last_begin: Komando.Type) -> String:
 			text += " "
 			text += params[i].to_edit_text()
 	else:
+		# TIPのto_edit_linesは、コマンド別にオーバーライドされている
 		text = tip.to_edit_lines(last_begin)
 		# エラーがあれば
-		if tip.error_text != "":
-			text = " " + tip.error_text
+		#paneru.tip.error_text != ""
+		if tip.error_text_trans != "":
+			text = "READ_ERROR" + " " + komando_as_str + " " + tip.error_text_trans
+
 	return text

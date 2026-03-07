@@ -20,7 +20,7 @@ var v_int: int = 0
 var v_float: float = 0.0
 var v_str: String = ""
 var v_jokens: Array[Joken] = []
-var error_text: String = ""
+var parse_edit_error_text: String = ""
 
 
 static func add_int_to_params(params: Array[PaneruParam], new_v_int: int) -> void:
@@ -108,7 +108,7 @@ static func try_parse_edit_text(words: Array[String]) -> Array[PaneruParam]:
 		if idx + 1 > words.size() - 1:
 			# エラー
 			# wordが2つペアになっていない
-			param.error_text = "型と値のペアになっていない。"
+			param.parse_edit_error_text = "型と値のペアになっていない。"
 			break
 
 		var word0: String = words[idx + 0]
@@ -124,7 +124,7 @@ static func try_parse_edit_text(words: Array[String]) -> Array[PaneruParam]:
 				param.v_int = word1.to_int()
 			else:
 				# エラー
-				param.error_text = "INTの後の値が解析できない。"
+				param.parse_edit_error_text = "INTの後の値が解析できない。"
 
 		elif word0 == "FLOAT":
 			param.param_type = PaneruParam.Type.FLOAT
@@ -132,7 +132,7 @@ static func try_parse_edit_text(words: Array[String]) -> Array[PaneruParam]:
 				param.v_float = word1.to_float()
 			else:
 				# エラー
-				param.error_text = "FLOATの後の値が解析できない。"
+				param.parse_edit_error_text = "FLOATの後の値が解析できない。"
 
 		elif word0 == "STRING":
 			param.param_type = PaneruParam.Type.STRING
@@ -145,7 +145,7 @@ static func try_parse_edit_text(words: Array[String]) -> Array[PaneruParam]:
 				param.v_str = guid.v_str
 			else:
 				# エラー
-				param.error_text = "GUIDの後の値が解析できない。"
+				param.parse_edit_error_text = "GUIDの後の値が解析できない。"
 
 		elif word0 == "SUPOTTO":
 			param.param_type = PaneruParam.Type.GUID

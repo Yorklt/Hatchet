@@ -2,14 +2,17 @@ class_name TIPResolver
 extends Node
 
 
-static func transcript_panels(panerus: Array[Paneru]) -> void:
+static func transcript_panels(dst_error_count: Array[int], panerus: Array[Paneru]) -> void:
 
+	var error_count: int = 0
 	for panel_idx in range(0, panerus.size()):
 		var paneru: Paneru = panerus[panel_idx]
 		paneru.tip = TIPResolver.try_create_tip_by_komando(paneru.komando_type)
 		if paneru.tip != null:
 			paneru.tip.transcript(paneru.params)
-
+			if paneru.tip.error_text_trans != "":
+				error_count += 1
+	dst_error_count.append(error_count)
 
 
 static func try_create_tip_by_komando(komando_type: Komando.Type) -> TIP:
@@ -122,5 +125,9 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 		# 未対応コマンドはファイル記載のコマンドをべた書きしている
 		# 例: [[コマンド]] FINALCOMBAT INT 3 FLOAT 0.2 FLOAT 0.1
 		return Komando.Type.KOMANDO
+	if word0 == "READ_ERROR":
+		return Komando.Type.READ_ERROR
+	if word0 == "INTERP_ERROR":
+		return Komando.Type.INTERP_ERROR
 
 	return Komando.Type.INVALID

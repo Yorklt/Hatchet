@@ -1,4 +1,4 @@
-class_name TIPTWriter
+class_name TIPTranslator
 extends Node
 
 # KomandoTypeとPaneruParamから、TIPテキストまで。

@@ -16,7 +16,7 @@ func transcript(
 	if params[p_idx].param_type == PaneruParam.Type.GUID:
 		guid = GUID.create(params[p_idx].v_str)
 	else:
-		error_text += "P1がGUIDでない"
+		error_text_trans += "P1がGUIDでない"
 
 	p_idx += 1
 
@@ -108,7 +108,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 #	"call" guid opt( "<<完了待つ>>" "<<完了待たず>>" .... )
 
@@ -118,16 +118,16 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "call":
-		error_text += "callを期待したがcallではない。: " + word + " "
+		dst_error_text.append("callを期待したがcallではない。: " + word)
 		return -1
 
 	word = edit_line.try_get_next_word()
 	if word == "":
-		error_text += "callの後でguid無しに終わっている。: " + word + " "
+		dst_error_text.append("callの後でguid無しに終わっている。: " + word)
 		return -1
 	guid = GUID.try_parse_text(word)
 	if guid == null:
-		error_text += "callの後がguidでない。: " + word + " "
+		dst_error_text.append("callの後がguidでない。: " + word)
 		return -1
 	
 	for i in range(0, 99):
@@ -148,7 +148,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			does_begin_at_next_frame = false
 		else:
 			# エラー
-			error_text += "callの後に不明なワード: " + word + " "
+			dst_error_text.append("callの後に不明なワード: " + word)
 			pass
 
 	line_idx += 1

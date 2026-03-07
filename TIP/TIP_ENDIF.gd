@@ -32,7 +32,7 @@ func to_edit_lines(last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""
 	var edit_line: TIPEditLine = null
@@ -52,7 +52,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		is_valid = true
 
 	if is_valid == false:
-		error_text += "endifでもendpickでもendexでもendcombatでもない。: " + word + " "
+		dst_error_text.append("endifでもendpickでもendexでもendcombatでもない。: " + word)
 		return -1
 
 	line_idx += 1

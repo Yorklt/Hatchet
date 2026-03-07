@@ -86,7 +86,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	# [[文字列代入]] L:お名前 <<上書き>>
 	# [[文字列代入]] A:リスト[L:i] <<最後尾>>
@@ -103,14 +103,14 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 			word = edit_line.try_get_next_word()
 			lhs_guid = GUID.try_parse_text(word)
 			if lhs_guid == null:
-				error_text += "左辺が特殊タイプだけどGUIDが不明。: " + word
+				dst_error_text.append("左辺が特殊タイプだけどGUIDが不明。: " + word)
 				return -1
 			pass
 		else:
 			lhs_type = 0
 			var hensu: Hensu = Hensu.try_parse_edit_text(word)
 			if hensu == null:
-				error_text += "左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg + " "
+				dst_error_text.append("左辺が変数ではない。: " + word + " " + Hensu.parse_fail_msg)
 				return -1
 			lhs_hensu = hensu
 
@@ -123,7 +123,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		elif word == "<<最後尾>>":
 			store_type = TIP_STRING_VARIABLE.StoreType.BACK
 		else:
-			error_text += "代入タイプが不明。: " + word
+			dst_error_text.append("代入タイプが不明。: " + word)
 			return -1
 
 	line_idx += 1

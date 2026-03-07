@@ -1,21 +1,44 @@
 class_name MainWindow
 extends Control
 
-var _filepath_line_edit: LineEdit = null
+# UI
+
+# ロード
 var _file_dialog_button: Button = null
+var _path_history_list: ItemList = null
+var _filepath_line_edit: LineEdit = null
+var _filepath_error_label: Label = null
 var _load_button: Button = null
-var _save_button: Button = null
+
+# イベントUI
+var _loaded_path_label: Label = null
+var _ibento_name_label: Label = null
 var _shiito_list: ItemList = null
-var _content_edit: TextEdit = null
+var _trans_error_count_label: Label = null
+
+# 逆変換
 var _reverse_button: Button = null
 var _auto_reverse_check_button: CheckButton = null
+var _reverse_error_count_label: Label = null
+
+# 保存
+var _save_button: Button = null
+
+# 編集テキスト
+var _content_edit: TextEdit = null
+
+# 逆変換、生データ
+var _tab_container: TabContainer = null
 var _reversed_file_edit: TextEdit = null
 var _raw_text_edit: TextEdit = null
-var _error_count_label: Label = null
+
+# その他
 var _file_dialog: FileDialog = null
+
 
 var _hatchet: Hatchet = null
 
+# エディタの状態
 var _edit_shiito_idx: int = -1
 var _does_auto_reverse: bool = true
 var _is_content_edited: bool = false
@@ -24,53 +47,76 @@ var _content_edit_time: float = 0.0
 
 func _ready() -> void:
 
+	_does_auto_reverse = true
+
+
 	# シーン埋め込みのノード取得
-	_filepath_line_edit = $FilepathEdit as LineEdit
+
 	_file_dialog_button = $FileDialogButton as Button
+	_path_history_list = $PathHistoryList as ItemList
+	_filepath_line_edit = $FilepathEdit as LineEdit
+	_filepath_error_label = $FilepathErrorLabel as Label
 	_load_button = $LoadButton as Button
-	_save_button = $SaveButton as Button
+
+	_loaded_path_label = $LoadedPathLabel as Label
+	_ibento_name_label = $IbentoNameLabel as Label
 	_shiito_list = $ShiitoList as ItemList
-	_content_edit = $HSplitContainer/ContentEdit as TextEdit
+	_trans_error_count_label = $TransErrorCountLabel as Label
+
 	_reverse_button = $ReverseButton as Button
 	_auto_reverse_check_button = $AutoReverseCheckButton as CheckButton
+	_reverse_error_count_label = $ErrorCount as Label
+
+	_save_button = $SaveButton as Button
+	_content_edit = $HSplitContainer/ContentEdit as TextEdit
+	
+	_tab_container = $HSplitContainer/TabContainer as TabContainer
 	_reversed_file_edit = $HSplitContainer/TabContainer/Reversed/IbentoFileText as TextEdit
 	_raw_text_edit = $HSplitContainer/TabContainer/Raw/OriginalText as TextEdit
-	_error_count_label = $ErrorCount as Label
-
-	# ファイルパスの入力欄
-	_filepath_line_edit.text_changed.connect(_on_filepath_line_edit_text_changed)
 
 	# ファイル選択ダイアログを開くボタン
 	_file_dialog_button.pressed.connect(_on_file_dialog_button_pressed)
+	
+	# 履歴リスト
+	_path_history_list.item_selected.connect(_on_path_history_list_selected)
+
+	# ファイルパスの入力欄
+	_filepath_line_edit.text_changed.connect(_on_filepath_line_edit_text_changed)
 
 	# ロードボタン
 	_load_button.disabled = true
 	_load_button.pressed.connect(_on_load_button_pressed)
 
+	# シートリスト
+	_shiito_list.item_selected.connect(_on_shiito_list_selected)
+
+	# 逆変換ボタン
+	_reverse_button.pressed.connect(_on_reverse_button_pressed)
+
+	# 自動変換チェックボックス
+	_auto_reverse_check_button.button_pressed = _does_auto_reverse
+	_auto_reverse_check_button.toggled.connect(_on_auto_reverse_check_button_toggled)
+
 	# セーブボタン
 	_save_button.disabled = true
 	_save_button.pressed.connect(_on_save_button_pressed)
 
-	# シートリスト
-	_shiito_list.item_selected.connect(_on_shiito_list_selected)
+	# タブ
+	_tab_container.set_tab_title(0, "変数")
+	_tab_container.set_tab_title(1, "逆変換結果")
+	_tab_container.set_tab_title(2, "元データ")
+	_tab_container.set_tab_title(3, "記述例")
 
 	# 内容エディタ
 	_content_edit.editable = false
 	_content_edit.lines_edited_from.connect(_on_content_edit_lines_edited_from)
-
-	# 変換ボタン
-	_reverse_button.pressed.connect(_on_reverse_button_pressed)
-
-	# 自動変換チェックボックス
-	_does_auto_reverse = true
-	_auto_reverse_check_button.button_pressed = _does_auto_reverse
-	_auto_reverse_check_button.toggled.connect(_on_auto_reverse_check_button_toggled)
 	
 	# 逆変換後のテキスト
+	_reversed_file_edit.editable = false
 	_reversed_file_edit.caret_changed.connect(_on_ibento_file_edit_caret_changed)
 	
 	# 生データテキスト
-	_reversed_file_edit.editable = false
+	_raw_text_edit.editable = false
 
 	# 内容エディタハイライト
 	var highlighter: CodeHighlighter = CodeHighlighter.new()
@@ -104,6 +150,9 @@ func _ready() -> void:
 	highlighter.add_keyword_color("exclude", Color.WEB_GRAY)
 	highlighter.add_keyword_color("endex", Color.WEB_GRAY)
 
+	highlighter.add_keyword_color("READ_ERROR", Color.PALE_VIOLET_RED)
+	highlighter.add_keyword_color("INTERP_ERROR", Color.PALE_VIOLET_RED)
+
 	highlighter.add_color_region("//", "", Color.WEB_GRAY, true)
 	highlighter.add_color_region("[[", "]]", Color.AQUAMARINE, false)
 	highlighter.add_color_region("<<", ">>", Color.DARK_KHAKI, false)
@@ -120,7 +169,14 @@ func _ready() -> void:
 	highlighter_file.add_color_region("{{", "}}", Color.BURLYWOOD, false)
 	_reversed_file_edit.syntax_highlighter = highlighter_file
 
+	# 生データテキストのハイライト
+	_reversed_file_edit.syntax_highlighter = highlighter_file
+
 	_hatchet = Hatchet.new()
+	_hatchet.load_user_settings()
+
+	# ファイル履歴
+	_refresh_file_history_list()
 
 
 func _process(delta: float) -> void:
@@ -130,10 +186,6 @@ func _process(delta: float) -> void:
 			_is_content_edited = false
 			_content_edit_time = 1.0
 			_reverse_tip_and_show_ibento_file_text()
-
-
-func _on_filepath_line_edit_text_changed(_text: String) -> void:
-	_update_load_button()
 
 
 # ファイルダイアログ
@@ -189,19 +241,22 @@ func _on_file_dialog_file_selected(path: String) -> void:
 
 
 func _on_file_dialog_canceled() -> void:
-
 	_file_dialog.queue_free()
 	_file_dialog = null
 
 
+func _on_path_history_list_selected(index: int) -> void:
+	var path: String = _path_history_list.get_item_text(index)
+	_filepath_line_edit.text = path
+	_update_load_button()
+
+
+func _on_filepath_line_edit_text_changed(_text: String) -> void:
+	_update_load_button()
+
+
 func _on_load_button_pressed() -> void:
-
 	_load_ibento()
-
-
-func _on_save_button_pressed() -> void:
-
-	_save_ibento()
 
 
 func _on_shiito_list_selected(index: int) -> void:
@@ -210,6 +265,19 @@ func _on_shiito_list_selected(index: int) -> void:
 	_content_edit.text = edit_text
 	_content_edit.editable = true
 	_show_raw_text()
+
+
+func _on_reverse_button_pressed() -> void:
+
+	_reverse_tip_and_show_ibento_file_text()
+
+
+func _on_auto_reverse_check_button_toggled(toggled_on: bool) -> void:
+	_does_auto_reverse = toggled_on
+
+
+func _on_save_button_pressed() -> void:
+	_save_ibento()
 
 
 func _on_content_edit_lines_edited_from(_from_line: int, _to_line: int) -> void:
@@ -241,13 +309,13 @@ func _update_load_button() -> void:
 	if path != "":
 		if FileAccess.file_exists(path) == true:
 			_load_button.disabled = false
-			_load_button.text = "読み込み"
+			_filepath_error_label.text = ""
 		else:
 			_load_button.disabled = true
-			_load_button.text = "存在しません"
+			_filepath_error_label.text = "存在しません"
 	else:
 		_load_button.disabled = true
-		_load_button.text = ""
+		_filepath_error_label.text = ""
 
 
 func _update_save_button() -> void:
@@ -258,32 +326,6 @@ func _update_save_button() -> void:
 	if can_save == false: # セーブできないならボタンを押せない(disable)でよろしい(true)
 		_save_button.disabled = true
 
-	var path: String = _filepath_line_edit.text
-
-	# 接尾辞を付ける
-	var extension: String = path.get_extension()
-	path = path.left(0 - extension.length() - 1) # 拡張子とピリオドを取り除く
-	path += "_mod"
-	path += "." + extension
-
-	# ファイルの有無で表示を変える
-	if FileAccess.file_exists(path) == true:
-		_save_button.disabled = false
-		_save_button.text = "上書き"
-	else:
-		_save_button.disabled = false
-		_save_button.text = "新規保存"
-
-
-func _on_reverse_button_pressed() -> void:
-
-	_reverse_tip_and_show_ibento_file_text()
-
-
-func _on_auto_reverse_check_button_toggled(toggled_on: bool) -> void:
-	_does_auto_reverse = toggled_on
-
-
 
 func _reverse_tip_and_show_ibento_file_text() -> void:
 
@@ -292,8 +334,9 @@ func _reverse_tip_and_show_ibento_file_text() -> void:
 
 	var error_count: int = _hatchet.reverse_tip(_edit_shiito_idx)
 	if error_count > 0:
-		# エラーがあっても続ける
-		pass
+		_reverse_error_count_label.text = "エラー: " + "%d" % error_count + "個"
+	else:
+		_reverse_error_count_label.text = ""
 	
 	var file_text: String = _hatchet.shiito_to_file_text(_edit_shiito_idx)
 	
@@ -304,6 +347,7 @@ func _reverse_tip_and_show_ibento_file_text() -> void:
 	_reversed_file_edit.set_caret_line(caret_line, true)
 	_reversed_file_edit.scroll_vertical = scroll_vertical
 
+	_update_save_button()
 
 
 func _show_raw_text() -> void:
@@ -339,6 +383,19 @@ func _load_ibento() -> void:
 	_content_edit.editable = true
 	_show_raw_text()
 
+	var trans_error_count: int = _hatchet.get_trans_error_count(_edit_shiito_idx)
+	if trans_error_count > 0:
+		_trans_error_count_label.text = "読込エラー: " + "%d" % trans_error_count + "個"
+	else:
+		_trans_error_count_label.text = ""
+
+	_refresh_file_history_list()
+	_loaded_path_label.text = _hatchet.get_loaded_path()
+	_ibento_name_label.text = _hatchet.get_ibento_name()
+	_update_load_button()
+	
+	_hatchet.save_user_settings()
+
 
 func _save_ibento() -> void:
 
@@ -351,3 +408,12 @@ func _save_ibento() -> void:
 	path += "." + extension
 
 	_hatchet.save_ibento(path)
+
+
+func _refresh_file_history_list() -> void:
+	_path_history_list.clear()
+	var file_history_paths: Array[String] = _hatchet.get_file_history_paths_copy()
+	# 新しいものを先に表示する
+	for i in range(0, file_history_paths.size()):
+		var idx: int = file_history_paths.size() - 1 - i
+		_path_history_list.add_item(file_history_paths[idx])

@@ -14,7 +14,7 @@ func transcript(
 	if params[p_idx].param_type == PaneruParam.Type.STRING:
 		comment_text = params[p_idx].v_str
 	else:
-		error_text += "P1が文字列でない" + " "
+		error_text_trans += "P1が文字列でない" + " "
 
 
 func reverse_into_paneru_params(
@@ -31,10 +31,10 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	text += "//"
 	text += " "
 	text += comment_text
-	return text + error_text
+	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 #	"call" guid opt( "<<完了待つ>>" "<<完了待たず>>" .... )
 
@@ -44,7 +44,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "//":
-		error_text += "//を期待したが//ではない。: " + word + " "
+		dst_error_text.append("//を期待したが//ではない。: " + word)
 		return -1
 
 	# 行の残りを全部コメントとする

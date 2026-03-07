@@ -4,6 +4,8 @@ extends RefCounted
 enum Type
 {
 	INVALID,
+	READ_ERROR,
+	INTERP_ERROR,
 	KOMANDO, # べた書き
 	COMMENT,
 	HLVARIABLE,

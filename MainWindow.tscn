@@ -46,11 +46,6 @@ offset_top = 88.0
 offset_right = 336.0
 offset_bottom = 216.0
 theme_override_font_sizes/font_size = 12
-item_count = 4
-item_0/text = "あいうえおかきくけこさしすせそたちつてとなにぬねの"
-item_1/text = "いいいい"
-item_2/text = "う"
-item_3/text = "え"
 
 [node name="LoadButton" type="Button" parent="."]
 layout_mode = 1
@@ -66,7 +61,14 @@ offset_left = 16.0
 offset_top = 256.0
 offset_right = 336.0
 offset_bottom = 288.0
-placeholder_text = "例: C:/クエスト/料理作成.txt"
+
+[node name="FilepathErrorLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 288.0
+offset_right = 336.0
+offset_bottom = 311.0
+theme_override_font_sizes/font_size = 12
 
 [node name="HSeparator" type="HSeparator" parent="."]
 layout_mode = 1
@@ -75,37 +77,43 @@ offset_top = 352.0
 offset_right = 336.0
 offset_bottom = 360.0
 
-[node name="LoadedFilepathLabel" type="Label" parent="."]
+[node name="LoadedPathLabel" type="Label" parent="."]
 layout_mode = 1
 offset_left = 16.0
 offset_top = 368.0
 offset_right = 336.0
 offset_bottom = 417.0
-text = "C:/Exported Files/Example Project/クエスト/料理作成.txt"
 autowrap_mode = 1
 
 [node name="IbentoNameLabel" type="Label" parent="."]
 layout_mode = 1
 offset_left = 16.0
-offset_top = 464.0
+offset_top = 416.0
 offset_right = 336.0
-offset_bottom = 487.0
-text = "料理クエスト会話と選択（レシピ解放後）"
+offset_bottom = 439.0
 
 [node name="ShiitoLabel" type="Label" parent="."]
 layout_mode = 1
 offset_left = 16.0
-offset_top = 504.0
+offset_top = 448.0
 offset_right = 128.0
-offset_bottom = 527.0
+offset_bottom = 471.0
 text = "シート"
 
 [node name="ShiitoList" type="ItemList" parent="."]
 layout_mode = 1
 offset_left = 16.0
-offset_top = 528.0
+offset_top = 472.0
 offset_right = 336.0
-offset_bottom = 656.0
+offset_bottom = 600.0
+
+[node name="TransErrorCountLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 616.0
+offset_right = 336.0
+offset_bottom = 640.0
+text = "エラーなし"
 
 [node name="HSeparator2" type="HSeparator" parent="."]
 layout_mode = 1
@@ -120,7 +128,7 @@ offset_left = 16.0
 offset_top = 704.0
 offset_right = 104.0
 offset_bottom = 736.0
-text = "変換"
+text = "逆変換"
 
 [node name="AutoReverseCheckButton" type="CheckButton" parent="."]
 layout_mode = 1
@@ -145,35 +153,26 @@ offset_right = 336.0
 offset_bottom = 768.0
 text = "エラーなし"
 
-[node name="OverwriteCheckButton" type="CheckButton" parent="."]
-layout_mode = 1
+[node name="HSeparator3" type="HSeparator" parent="."]
+layout_mode = 0
 offset_left = 16.0
-offset_top = 832.0
-offset_right = 48.0
-offset_bottom = 856.0
+offset_top = 808.0
+offset_right = 336.0
+offset_bottom = 816.0
 
-[node name="OverwriteLabel" type="Label" parent="."]
-layout_mode = 1
-offset_left = 48.0
-offset_top = 832.0
-offset_right = 304.0
-offset_bottom = 856.0
-text = "開いたファイルを上書き"
-
-[node name="SuffixCheckButton" type="CheckButton" parent="."]
+[node name="SaveOptionButton" type="OptionButton" parent="."]
 layout_mode = 1
 offset_left = 16.0
 offset_top = 872.0
-offset_right = 48.0
+offset_right = 336.0
 offset_bottom = 896.0
-
-[node name="SuffixLabel" type="Label" parent="."]
-layout_mode = 1
-offset_left = 48.0
-offset_top = 872.0
-offset_right = 304.0
-offset_bottom = 896.0
-text = "接尾辞(_mod)を付ける"
+selected = 0
+fit_to_longest_item = false
+item_count = 2
+popup/item_0/text = "接尾辞を付ける(*.txt→*_mod.txt)"
+popup/item_0/id = 0
+popup/item_1/text = "同名で上書き（未対応）"
+popup/item_1/id = 1
 
 [node name="SaveButton" type="Button" parent="."]
 layout_mode = 1
@@ -198,7 +197,7 @@ drag_area_highlight_in_editor = true
 
 [node name="ContentEdit" type="TextEdit" parent="HSplitContainer"]
 layout_mode = 2
-placeholder_text = "ここに内容が表示されます。"
+placeholder_text = "編集用のテキスト領域です。内容を書き換えてください。"
 
 [node name="TabContainer" type="TabContainer" parent="HSplitContainer"]
 layout_mode = 2
@@ -218,6 +217,7 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
+placeholder_text = "逆変換後のファイルイメージです。エラーがあればここに表示されます。"
 
 [node name="Raw" type="Control" parent="HSplitContainer/TabContainer"]
 visible = false

@@ -79,7 +79,7 @@ func to_edit_lines(_last_begin: Komando.Type) -> String:
 	return text
 
 
-func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
+func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	# loop times 10
 	# loop for L:i times 10
@@ -91,7 +91,7 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	word = edit_line.try_get_next_word()
 	if word != "loop":
-		error_text += "loopを期待したがcallではない。: " + word
+		dst_error_text.append("loopを期待したがcallではない。: " + word)
 		return -1
 
 	for i in range(0, 99):
@@ -99,26 +99,26 @@ func from_edit_lines(edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 		if word == "":
 			break
 
-		if word != "for":
+		if word == "for":
 			word = edit_line.try_get_next_word()
 			counter = Hensu.try_parse_edit_text(word)
 			if counter == null:
-				error_text += "forの後が変数ではない。: " + word
+				dst_error_text.append("forの後が変数ではない。: " + word)
 				return -1
-		elif word != "from":
+		elif word == "from":
 			word = edit_line.try_get_next_word()
 			init_val = ValDesign.try_parse_edit_text(word)
 			if init_val == null:
-				error_text += "fromの後が直地でも変数でもない。: " + word
+				dst_error_text.append("fromの後が直地でも変数でもない。: " + word)
 				return -1
-		elif word != "times":
+		elif word == "times":
 			word = edit_line.try_get_next_word()
 			count = ValDesign.try_parse_edit_text(word)
 			if count == null:
-				error_text += "timesの後が直地でも変数でもない。: " + word
+				dst_error_text.append("timesの後が直地でも変数でもない。: " + word)
 				return -1
 		else:
-			error_text += "loopのパラメータが不明（forでもfromでもtimesでもない）。: " + word
+			dst_error_text.append("loopのパラメータが不明（forでもfromでもtimesでもない）。: " + word)
 			return -1
 
 	line_idx += 1

@@ -12,6 +12,8 @@ config_version=5
 
 config/name="Hatchet"
 run/main_scene="uid://mwnbg3xoi0qs"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Hatchet"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 

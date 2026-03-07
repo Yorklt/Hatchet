@@ -1,4 +1,4 @@
-class_name TIPTReader
+class_name TIPReverser
 extends Node
 
 # TIPテキストからTIPEditLineを経由して、KomandoTypeとPaneruParamまで。
@@ -34,7 +34,7 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 	if true:
 		var delimiters: Array[String] = ["\n", "\r", "\t"]
 		var allow_empty: bool = false # 空業は飛ばす
-		var lines: Array[String] = TIPTReader.split_text_with_delimiters(text, delimiters, allow_empty)
+		var lines: Array[String] = TIPReverser.split_text_with_delimiters(text, delimiters, allow_empty)
 		for i in range(0, lines.size()):
 			var edit_line: TIPEditLine = TIPEditLine.new()
 			edit_line.line = lines[i]
@@ -65,6 +65,18 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 			paneru.komando_as_str = "?"
 			paneru.komando_type = Komando.Type.INVALID
 			paneru.reverse_error = "行が解釈不能: " + edit_line.line
+			line_idx += 1
+			continue
+		elif komando_type == Komando.Type.READ_ERROR:
+			paneru.komando_as_str = "error"
+			paneru.komando_type = Komando.Type.READ_ERROR
+			paneru.reverse_error = "読み込みエラーがあります。: " + edit_line.line
+			line_idx += 1
+			continue
+		elif komando_type == Komando.Type.INTERP_ERROR:
+			paneru.komando_as_str = "error"
+			paneru.komando_type = Komando.Type.INTERP_ERROR
+			paneru.reverse_error = "解釈エラーがあります。: " + edit_line.line
 			line_idx += 1
 			continue
 		elif komando_type == Komando.Type.KOMANDO:
@@ -98,7 +110,10 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 			line_idx += 1
 			continue
 		paneru.tip = tip
-		var line_idx_next: int = tip.from_edit_lines(edit_lines, line_idx)
+		var dst_error_text: Array[String] = []
+		var line_idx_next: int = tip.from_edit_lines(dst_error_text, edit_lines, line_idx)
+		if dst_error_text.size() > 0:
+			paneru.reverse_error = dst_error_text[0]
 		if line_idx_next < 0: # TIPTエラー
 			line_idx += 1
 			continue

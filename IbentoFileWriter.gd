@@ -107,6 +107,7 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 	var word0: String = ""
 	var word1: String = ""
 
+	var has_error: bool = false
 	if paneru.komando_type == Komando.Type.INVALID:
 		word0 = "{{コマンドエラー}}"
 		word1 = "{{" + paneru.reverse_error + "}}"
@@ -114,6 +115,23 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 		line.word0 = word0
 		line.word1 = word1
 		lines.append(line)
+		has_error = true
+	elif paneru.komando_type == Komando.Type.READ_ERROR:
+		word0 = "{{読み込みエラー}}"
+		word1 = "{{" + paneru.reverse_error + "}}"
+		line = IbentoFileLine.new()
+		line.word0 = word0
+		line.word1 = word1
+		lines.append(line)
+		has_error = true
+	elif paneru.komando_type == Komando.Type.INTERP_ERROR:
+		word0 = "{{解釈エラー}}"
+		word1 = "{{" + paneru.reverse_error + "}}"
+		line = IbentoFileLine.new()
+		line.word0 = word0
+		line.word1 = word1
+		lines.append(line)
+		has_error = true
 	elif paneru.komando_type == Komando.Type.KOMANDO:
 		# べた書きコマンドは右から左に流す
 		word0 = "コマンド"
@@ -131,10 +149,12 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 		line.word1 = word1
 		lines.append(line)
 
-	if paneru.tip != null:
-		if paneru.tip.error_text != "":
-			word0 = "{TIPエラー}}"
-			word1 = "{{" + paneru.tip.error_text + "}}"
+	if has_error == false:
+		# くどいので、すでにエラー出してるならもう同じパネルで出さない
+		# 読み込みエラーなら逆変換は失敗するだろうし
+		if paneru.reverse_error != "":
+			word0 = "{{逆変換エラー}}"
+			word1 = "{{" + paneru.reverse_error + "}}"
 			line = IbentoFileLine.new()
 			line.indent = 0
 			line.word0 = word0
