@@ -117,6 +117,10 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 		return Komando.Type.JUMP
 	if word0 == "msg":
 		return Komando.Type.MESSAGE
+	if word0 == "pick":
+		return Komando.Type.CHOICES
+	if word0 == "picked":
+		return Komando.Type.BRANCH
 	if word0 == "wait":
 		return Komando.Type.WAIT
 	if word0 == "call":

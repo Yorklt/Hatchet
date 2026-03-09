@@ -164,33 +164,129 @@ static func paneru_to_file_lines(lines: Array[IbentoFileLine], paneru: Paneru) -
 	for i in range(0, paneru.params.size()):
 		var param: PaneruParam = paneru.params[i]
 
-		if param.param_type == PaneruParam.Type.INT:
-			word0 = "整数"
-			word1 = "%d" % param.v_int
-		elif param.param_type == PaneruParam.Type.FLOAT:
-			word0 = "小数"
-			word1 = "%f" % param.v_float
-		elif param.param_type == PaneruParam.Type.STRING:
-			word0 = "文字列"
-			word1 = param.v_str
-		elif param.param_type == PaneruParam.Type.GUID:
-			word0 = "Guid"
-			word1 = param.v_str
-		elif param.param_type == PaneruParam.Type.VARIABLE:
-			word0 = "変数"
-			word1 = param.v_str
-		elif param.param_type == PaneruParam.Type.LOCAL:
-			word0 = "ローカル変数"
-			word1 = param.v_str
-		elif param.param_type == PaneruParam.Type.ARRAY:
-			word0 = "配列変数"
-			word1 = param.v_str
-	
-		line = IbentoFileLine.new()
-		line.indent = 3
-		line.word0 = word0
-		line.word1 = word1
-		lines.append(line)
+		var is_multi_lines: bool = false
+		if param.param_type == PaneruParam.Type.JOKEN_ARG:
+			is_multi_lines = true
+
+		if is_multi_lines == false:
+			if param.param_type == PaneruParam.Type.INT:
+				word0 = "整数"
+				word1 = "%d" % param.v_int
+			elif param.param_type == PaneruParam.Type.FLOAT:
+				word0 = "小数"
+				word1 = "%f" % param.v_float
+			elif param.param_type == PaneruParam.Type.STRING:
+				word0 = "文字列"
+				word1 = param.v_str
+			elif param.param_type == PaneruParam.Type.GUID:
+				word0 = "Guid"
+				word1 = param.v_str
+			elif param.param_type == PaneruParam.Type.VARIABLE:
+				word0 = "変数"
+				word1 = param.v_str
+			elif param.param_type == PaneruParam.Type.LOCAL:
+				word0 = "ローカル変数"
+				word1 = param.v_str
+			elif param.param_type == PaneruParam.Type.ARRAY:
+				word0 = "配列変数"
+				word1 = param.v_str
+		
+			line = IbentoFileLine.new()
+			line.indent = 3
+			line.word0 = word0
+			line.word1 = word1
+			lines.append(line)
+
+		else:
+			if param.param_type == PaneruParam.Type.JOKEN_ARG:
+				line = IbentoFileLine.new()
+				line.indent = 3
+				line.word0 = "条件引数"
+				line.word1 = ""
+				lines.append(line)
+				
+				for k in range(0, param.v_jokens.size()):
+					var joken: Joken = param.v_jokens[k]
+					line = IbentoFileLine.new()
+					line.indent = 3
+					line.word0 = "条件"
+					if joken.joken_type == Joken.Type.COND_TYPE_VARIABLE:
+						line.word1 = "COND_TYPE_VARIABLE"
+					elif joken.joken_type == Joken.Type.COND_TYPE_ARRAY_VAR:
+						line.word1 = "COND_TYPE_ARRAY_VAR"
+					elif joken.joken_type == Joken.Type.COND_TYPE_SWITCH:
+						line.word1 = "COND_TYPE_SWITCH"
+					elif joken.joken_type == Joken.Type.COND_TYPE_ARRAY_SW:
+						line.word1 = "COND_TYPE_ARRAY_SW"
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "比較演算子"
+					if joken.operator == 0:
+						line.word1 = "EQUAL"
+					elif joken.operator == 1:
+						line.word1 = "NOT_EQUAL"
+					elif joken.operator == 2:
+						line.word1 = "EQUAL_GREATER"
+					elif joken.operator == 3:
+						line.word1 = "EQUAL_LOWER"
+					elif joken.operator == 4:
+						line.word1 = "LOWER"
+					elif joken.operator == 5:
+						line.word1 = "GREATER"
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "インデックス"
+					line.word1 = "%d" % joken.index
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "オプション"
+					line.word1 = "%d" % joken.option
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "ローカル参照"
+					if joken.rokaru_ref == true:
+						line.word1 = "True"
+					else:
+						line.word1 = "False"
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "ポインタ"
+					line.word1 = "%d" % joken.pointa
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "ポインタ名"
+					line.word1 = joken.pointa_name
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 4
+					line.word0 = "参照名"
+					line.word1 = joken.ref_name
+					lines.append(line)
+
+					line = IbentoFileLine.new()
+					line.indent = 3
+					line.word0 = "条件終了"
+					line.word1 = ""
+					lines.append(line)
+				
+				line = IbentoFileLine.new()
+				line.indent = 3
+				line.word0 = "条件引数終了"
+				line.word1 = ""
+				lines.append(line)
 
 	if paneru.komando_type != Komando.Type.INVALID:
 		word0 = "コマンド終了"

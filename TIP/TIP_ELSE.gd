@@ -24,6 +24,7 @@ func to_edit_lines(last_begin: Komando.Type) -> String:
 
 	return text
 
+
 func from_edit_lines(dst_error_text: Array[String], edit_lines: Array[TIPEditLine], line_idx: int) -> int:
 
 	var word: String = ""

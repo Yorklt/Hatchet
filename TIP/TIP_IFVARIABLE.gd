@@ -5,6 +5,8 @@ extends TIP
 var hensu_l : Hensu = null
 var op_type: int = -1
 var design_r: ValDesign = null
+var option_val: int = -1
+var option_arg: ValDesign = null
 
 
 func transcript(
@@ -16,29 +18,35 @@ func transcript(
 	
 	block_type = TIP.BlockType.BEGIN
 
-	# 左辺
+	# 左辺（必ず変数）
 	hensu_l = Hensu.parse_paneru_params(p_idx_next, params, p_idx)
 	p_idx = p_idx_next[0]
-
-	# オペランド
-	var mergin_idx: int = params.size() - 1 # 最後がオペランドと決め打ちする
-	var op_idx: int = -1
-	if params[mergin_idx].param_type == PaneruParam.Type.FLOAT:
-		op_idx = params.size() - 2 # 最後から2番目がオペランドと決め打ちする
-		if params[op_idx].param_type == PaneruParam.Type.INT:
-			op_type = params[op_idx].v_int
-		else:
-			error_text_trans += "最後から2番目のPがINTではない"
-	else:
-		op_idx = params.size() - 1 # マージンが無ければ最後がオペランド
-		if params[op_idx].param_type == PaneruParam.Type.INT:
-			op_type = params[op_idx].v_int
-		else:
-			error_text_trans += "最後のPがINTではない"
 
 	# 右辺
 	design_r = ValDesign.parse_paneru_params(p_idx_next, params, p_idx)
 	p_idx = p_idx_next[0]
+
+	# オペランド
+	if params[p_idx].param_type == PaneruParam.Type.INT:
+		op_type = params[p_idx].v_int
+		p_idx += 1
+	else:
+		error_text_trans += "左辺右辺の後の設定値の型がINTではない"
+		return
+
+	# オプションあり（まだ残り2つ以上Pがある）
+	if p_idx + 1 <= params.size() - 1:
+		# オプション
+		if params[p_idx].param_type == PaneruParam.Type.INT:
+			option_val = params[p_idx].v_int
+			p_idx += 1
+		else:
+			error_text_trans += "オペランドの後にオプションが続きそうだけど、型がINTではない"
+			return
+
+		# 右辺
+		option_arg = ValDesign.parse_paneru_params(p_idx_next, params, p_idx)
+		p_idx = p_idx_next[0]
 
 
 func reverse_into_paneru_params(

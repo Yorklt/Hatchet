@@ -32,7 +32,7 @@ static func tip_text_to_panerus(dst_panerus: Array[Paneru], text: String) -> voi
 
 	# テキストを行に分割
 	if true:
-		var delimiters: Array[String] = ["\n", "\r", "\t"]
+		var delimiters: Array[String] = ["\n", "\r"] # タブは含まないよ
 		var allow_empty: bool = false # 空業は飛ばす
 		var lines: Array[String] = TIPReverser.split_text_with_delimiters(text, delimiters, allow_empty)
 		for i in range(0, lines.size()):

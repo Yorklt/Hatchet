@@ -65,12 +65,27 @@ static func add_hensu_to_params(params: Array[PaneruParam], new_hensu: Hensu) ->
 	new_hensu.add_to_paneru_params(params)
 
 
+# 選択肢パネルの表示条件などで、変数だけのパラメータがあったりするので、それ用
+static func add_null_hensu_to_params(params: Array[PaneruParam]) -> void:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.VARIABLE
+	param.v_str = ""
+	params.append(param)
+
+
 static func add_chokuchi_to_params(params: Array[PaneruParam], new_chokuchi: Chokuchi) -> void:
 	new_chokuchi.add_to_paneru_params(params)
 
 
 static func add_val_design_to_params(params: Array[PaneruParam], new_vd: ValDesign) -> void:
 	new_vd.add_to_paneru_params(params)
+
+
+static func add_jokens_to_params(params: Array[PaneruParam], new_jokens: Array[Joken]) -> void:
+	var param: PaneruParam = PaneruParam.new()
+	param.param_type = PaneruParam.Type.JOKEN_ARG
+	param.v_jokens = new_jokens
+	params.append(param)
 
 
 static func is_type_literal(p_type: PaneruParam.Type) -> bool:
