@@ -111,6 +111,8 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 		return Komando.Type.LOOP
 	if word0 == "endloop":
 		return Komando.Type.ENDLOOP
+	if word0 == "break":
+		return Komando.Type.BREAK
 	if word0 == "label":
 		return Komando.Type.LABEL
 	if word0 == "goto":
@@ -125,6 +127,8 @@ static func try_solve_initial_word(word0: String, word1: String, word2: String) 
 		return Komando.Type.WAIT
 	if word0 == "call":
 		return Komando.Type.EXEC
+	if word0 == "exclude":
+		return Komando.Type.COMMENT_OUT
 	if word0 == "[[コマンド]]":
 		# 未対応コマンドはファイル記載のコマンドをべた書きしている
 		# 例: [[コマンド]] FINALCOMBAT INT 3 FLOAT 0.2 FLOAT 0.1
